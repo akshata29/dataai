@@ -14194,8 +14194,7 @@
 						"     format: 'table',",
 						"     staged: false,",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError') ~> CampaignAnalyticsASA"
+						"     skipDuplicateMapOutputs: true) ~> CampaignAnalyticsASA"
 					]
 				}
 			},
@@ -14330,7 +14329,6 @@
 						"     allowCopyCommand: true,",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
 						"     mapColumn(",
 						"          UserId = userId,",
 						"          ProductId = productId,",
@@ -15015,6 +15013,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/0_consumption delta')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi/Serverless"
+				},
+				"content": {
+					"query": "SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://dataaicurateddls.dfs.core.windows.net/nyctaxi/nyctaxi-consumption-df/transactions/materialized-view/',\n        FORMAT = 'DELTA'\n    ) AS [result]\nWHERE [result].taxi_type = 'green'\nand trip_year = 2019",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/0_create resource login')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -15053,6 +15074,29 @@
 					"currentConnection": {
 						"databaseName": "dataaidw",
 						"poolName": "dataaidw"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_curated delta')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi/Serverless"
+				},
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://dataaicurateddls.dfs.core.windows.net/nyctaxi/nyctaxi-curated-df/transactions/green-taxi/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://dataaicurateddls.dfs.core.windows.net/nyctaxi/nyctaxi-curated-df/transactions/yellow-taxi/',\n        FORMAT = 'DELTA'\n    ) AS [result]\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
 				},
@@ -15116,6 +15160,29 @@
 				},
 				"content": {
 					"query": "-- Perform aggregates and grouping operations to better understand the data.\nSELECT\n    TransactionDate, ProductId,\n        CAST(SUM(ProfitAmount) AS decimal(18,2)) AS [(sum) Profit],\n        CAST(AVG(ProfitAmount) AS decimal(18,2)) AS [(avg) Profit],\n        SUM(Quantity) AS [(sum) Quantity]\nFROM\n    OPENROWSET(\n        BULK 'https://dataairawdls.dfs.core.windows.net/wwi-02/sale-small/Year=2016/Quarter=Q4/Month=12/Day=20161231/sale-small-20161231-snappy.parquet',\n        FORMAT='PARQUET'\n    ) AS [r] GROUP BY r.TransactionDate, r.ProductId;\n\n\n-- How many records are contained within the Parquet files for 2019 data. \n-- This information is important for planning how we optimize for importing the data into Azure Synapse Analytics.\nSELECT\n    COUNT(*)\nFROM\n    OPENROWSET(\n        BULK 'https://dataairawdls.dfs.core.windows.net/wwi-02/sale-small/Year=2019/*/*/*/*',\n        FORMAT='PARQUET'\n    ) AS [r];",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_raw parquet')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi/Serverless"
+				},
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://dataairawdls.dfs.core.windows.net/nyctaxi/nyctaxi-staging/transactional-data/type=green/year=2015/month=*/*.parquet',\n        FORMAT = 'PARQUET'\n    ) AS [result]\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -15558,6 +15625,29 @@
 					},
 					"currentConnection": {
 						"databaseName": "TPCDSDBExternal",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/_Reference NycTaxi')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi"
+				},
+				"content": {
+					"query": "-- Custom built solution\n-- https://github.com/akshata29/msdaie2e",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
