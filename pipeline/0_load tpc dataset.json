@@ -47,7 +47,7 @@
 									"referenceName": "0_tpcdssmidw",
 									"type": "DatasetReference",
 									"parameters": {
-										"ServerName": "azsynapsewksash.sql.azuresynapse.net",
+										"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 										"DatabaseName": {
 											"value": "@pipeline().parameters.DatabaseName",
 											"type": "Expression"
@@ -83,7 +83,7 @@
 						"referenceName": "0_tpcdssmidw",
 						"type": "DatasetReference",
 						"parameters": {
-							"ServerName": "azsynapsewksash.sql.azuresynapse.net",
+							"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 							"DatabaseName": {
 								"value": "@pipeline().parameters.DatabaseName",
 								"type": "Expression"
@@ -123,6 +123,7 @@
 						"referenceName": "0_tpcdssmidw",
 						"type": "DatasetReference",
 						"parameters": {
+							"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 							"DatabaseName": {
 								"value": "@pipeline().parameters.DatabaseName",
 								"type": "Expression"
@@ -176,6 +177,7 @@
 									"referenceName": "0_tpcdssmidw",
 									"type": "DatasetReference",
 									"parameters": {
+										"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 										"DatabaseName": {
 											"value": "@pipeline().parameters.DatabaseName",
 											"type": "Expression"
@@ -233,7 +235,7 @@
 									"referenceName": "0_tpcdssmidw",
 									"type": "DatasetReference",
 									"parameters": {
-										"ServerName": "azsynapsewksash.sql.azuresynapse.net",
+										"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 										"DatabaseName": {
 											"value": "@pipeline().parameters.DatabaseName",
 											"type": "Expression"
@@ -312,7 +314,7 @@
 		"parameters": {
 			"DatabaseName": {
 				"type": "string",
-				"defaultValue": "azsynapsetpc"
+				"defaultValue": "dataaitpcdw"
 			}
 		},
 		"variables": {
