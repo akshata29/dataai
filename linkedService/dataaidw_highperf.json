@@ -1,0 +1,23 @@
+{
+	"name": "dataaidw_highperf",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataaisynapsewks.sql.azuresynapse.net;Initial Catalog=dataaidw;User ID=asa.sql.highperf",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "dataaikeyvault",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SqlPassword"
+			}
+		},
+		"connectVia": {
+			"referenceName": "dataaiir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

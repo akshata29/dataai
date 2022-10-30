@@ -1,0 +1,11 @@
+{
+	"name": "dataaiamlwks",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.MachineLearningServices/workspaces/dataaimlwks",
+		"groupId": "amlworkspace",
+		"fqdns": [
+			"a46829b8-f864-4896-b8f9-eb09febeb7cd.workspace.southcentralus.api.azureml.ms",
+			"a46829b8-f864-4896-b8f9-eb09febeb7cd.workspace.southcentralus.cert.api.azureml.ms"
+		]
+	}
+}

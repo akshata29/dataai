@@ -1,0 +1,20 @@
+{
+	"name": "06_create security tables",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/00_setup"
+		},
+		"content": {
+			"query": "create user [CEO] without login\ncreate user [DataAnalystMiami] without login\ncreate user [DataAnalystSanDiego] without login\n\nIF OBJECT_ID(N'[wwi_security].[CustomerInfo]', N'U') IS NOT NULL   \nDROP TABLE [wwi_security].[CustomerInfo]\n\nCREATE TABLE [wwi_security].[CustomerInfo]\n( \n\t[UserName] [nvarchar](100)  NULL,\n\t[Gender] [nvarchar](10)  NULL,\n\t[Phone] [nvarchar](50)  NULL,\n\t[Email] [nvarchar](150)  NULL,\n\t[CreditCard] [nvarchar](21)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = REPLICATE,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO\n\nCOPY INTO [wwi_security].[CustomerInfo]\nFROM 'https://dataairawdls.dfs.core.windows.net/wwi-02/security/customerinfo.csv'\nWITH (\n\t--CREDENTIAL = (IDENTITY = 'Storage Account Key', SECRET = 'DivozaHnB+c7HtcEo6nK1f/XQyGHmaMQShb2wXB/Jo4lEoP31MQX+hdU5do5wYmaRYh4mM+Ontro+ASt7AO0Tg=='),\n    FILE_TYPE = 'CSV',\n    FIRSTROW = 2,\n\tFIELDQUOTE='''',\n    ENCODING='UTF8'\n)\nGO\n\nIF OBJECT_ID(N'[wwi_security].[Sale]', N'U') IS NOT NULL  \nDROP TABLE [wwi_security].[Sale]\nGO\n\nCREATE TABLE [wwi_security].[Sale]\n( \n\t[ProductId] [int]  NOT NULL,\n\t[Analyst] [nvarchar](100)  NOT NULL,\n\t[Product] [nvarchar](200)  NOT NULL,\n\t[CampaignName] [nvarchar](200)  NOT NULL,\n\t[Quantity] [int]  NOT NULL,\n\t[Region] [nvarchar](50)  NOT NULL,\n\t[State] [nvarchar](50)  NOT NULL,\n\t[City] [nvarchar](50)  NOT NULL,\n\t[Revenue] [nvarchar](50)  NULL,\n\t[RevenueTarget] [nvarchar](50)  NULL\n)\nWITH\n(\n\tDISTRIBUTION = ROUND_ROBIN,\n\tCLUSTERED COLUMNSTORE INDEX\n)\nGO\n\nCOPY INTO [wwi_security].[Sale]\nFROM 'https://dataairawdls.dfs.core.windows.net/wwi-02/security/factsale.csv'\nWITH (\n\t--CREDENTIAL = (IDENTITY = 'Storage Account Key', SECRET = 'RqDON1zUPW0M2YDLsfuZo4j3EwJ9Uw64L4c+K041P9o1oIT8GN9KVPJgoGXQ9EF/EsUwY+UV/Aq9+AStdj3kLA=='),\n    FILE_TYPE = 'CSV',\n    FIRSTROW = 2,\n\tFIELDQUOTE='''',\n    ENCODING='UTF8'\n)\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dataaidw",
+				"poolName": "dataaidw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

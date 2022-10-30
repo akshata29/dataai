@@ -1,0 +1,44 @@
+{
+	"name": "2_asa_wwi_usertopproductpurchases_asa",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataaidw",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "WideWorldImporter/2_other data"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "UserId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ProductId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "ItemsPurchasedLast12Months",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "IsTopProduct",
+				"type": "bit"
+			},
+			{
+				"name": "IsPreferredProduct",
+				"type": "bit"
+			}
+		],
+		"typeProperties": {
+			"schema": "wwi",
+			"table": "UserTopProductPurchases"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

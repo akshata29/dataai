@@ -1,0 +1,19 @@
+{
+	"name": "2_customer_profile_cosmosdb",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataaicosmosdb",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "WideWorldImporter/2_other data"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {},
+		"typeProperties": {
+			"collectionName": "OnlineUserProfile01"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

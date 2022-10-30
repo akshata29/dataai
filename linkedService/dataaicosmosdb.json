@@ -1,0 +1,16 @@
+{
+	"name": "dataaicosmosdb",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "CosmosDb",
+		"typeProperties": {
+			"connectionString": "AccountEndpoint=https://dataaicosmosdb.documents.azure.com:443/;Database=OperationalDB;",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0VAMkVBODQ2MzktQ0UwMi00NEZFLUJFMDUtNTM5MzY3QkFBOTU1X2E4NDM5ZWJjLTZhY2ItNDY3My1hOWM2LTU2YjZmNDg0MDg2MiINCn0="
+		},
+		"connectVia": {
+			"referenceName": "dataaiir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

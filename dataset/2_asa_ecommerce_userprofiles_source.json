@@ -1,0 +1,44 @@
+{
+	"name": "2_asa_ecommerce_userprofiles_source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataairawdls",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "WideWorldImporter/2_other data"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "online-user-profiles-02",
+				"fileSystem": "wwi-02"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"visitorId": {
+					"type": "integer"
+				},
+				"topProductPurchases": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"productId": {
+								"type": "integer"
+							},
+							"itemsPurchasedLast12Months": {
+								"type": "integer"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

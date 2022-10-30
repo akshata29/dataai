@@ -1,0 +1,57 @@
+{
+	"name": "2_asa_wwi_campaign_analytics_asa",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataaidw",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "WideWorldImporter/2_other data"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "Region",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Country",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ProductCategory",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CampaignName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Revenue",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "RevenueTarget",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "City",
+				"type": "nvarchar"
+			},
+			{
+				"name": "State",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "wwi",
+			"table": "CampaignAnalytics"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

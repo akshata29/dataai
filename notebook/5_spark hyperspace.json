@@ -1,0 +1,994 @@
+{
+	"name": "5_spark hyperspace",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/03_machine learning"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "2807c6d8-4ce7-4af4-95b0-5edbc34ceee6"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1",
+				"state": {
+					"dc6f0b41-2d54-4441-9b5e-66a73477c95e": {
+						"type": "Synapse.DataFrame",
+						"sync_state": {
+							"table": {
+								"rows": [
+									{
+										"0": "386185",
+										"1": "Daisy",
+										"3": "Mueller",
+										"4": "Daisy Mueller",
+										"5": "Female",
+										"6": "60",
+										"7": "1960-05-05",
+										"8": "'35157 Elbert Hills",
+										"9": " South Evans Norway'",
+										"10": "0128-494-538"
+									},
+									{
+										"0": "386186",
+										"1": "Valerie",
+										"2": "O",
+										"3": "Gaylord",
+										"4": "Valerie O. Gaylord",
+										"5": "Female",
+										"6": "53",
+										"7": "1966-07-25",
+										"8": "'32569 Pietro Estate",
+										"9": " Lake Judahhaven Belize'",
+										"10": "0919-373-342"
+									},
+									{
+										"0": "386187",
+										"1": "Penny",
+										"3": "Botsford",
+										"4": "Penny Botsford",
+										"5": "Female",
+										"6": "54",
+										"7": "1965-09-09",
+										"8": "'36804 Katheryn Throughway",
+										"9": " Mazieport Taiwan'",
+										"10": "0571-252-751"
+									},
+									{
+										"0": "386188",
+										"1": "Larry",
+										"2": "D",
+										"3": "Kling",
+										"4": "Larry D. Kling",
+										"5": "Male",
+										"6": "53",
+										"7": "1966-08-20",
+										"8": "'49344 Jerel Falls",
+										"9": " West Jeanie Poland'",
+										"10": "0772-618-876"
+									},
+									{
+										"0": "386189",
+										"1": "Joy",
+										"2": "Q",
+										"3": "Schmidt",
+										"4": "Joy Q. Schmidt",
+										"5": "Female",
+										"6": "52",
+										"7": "1968-05-02",
+										"8": "'60337 Gorczany Cliffs",
+										"9": " South Kayden Ireland'",
+										"10": "0521-684-423"
+									},
+									{
+										"0": "386190",
+										"1": "Cheryl",
+										"3": "Langosh",
+										"4": "Cheryl Langosh",
+										"5": "Female",
+										"6": "40",
+										"7": "1979-07-13",
+										"8": "'92411 Chadrick Mall",
+										"9": " Constantinshire Zimbabwe'",
+										"10": "0874-664-271"
+									},
+									{
+										"0": "386191",
+										"1": "Ross",
+										"3": "Rohan",
+										"4": "Ross Rohan",
+										"5": "Male",
+										"6": "50",
+										"7": "1969-11-02",
+										"8": "'99138 VonRueden Pine",
+										"9": " Burleychester Ghana'",
+										"10": "0391-493-953"
+									},
+									{
+										"0": "386192",
+										"1": "Johnny",
+										"3": "Armstrong",
+										"4": "Johnny Armstrong",
+										"5": "Male",
+										"6": "49",
+										"7": "1970-09-01",
+										"8": "'91936 Haven Shore",
+										"9": " South Florencemouth United Kingdom'",
+										"10": "0134-597-510"
+									},
+									{
+										"0": "386193",
+										"1": "Teresa",
+										"2": "E",
+										"3": "Dibbert",
+										"4": "Teresa E. Dibbert",
+										"5": "Female",
+										"6": "48",
+										"7": "1971-12-01",
+										"8": "'43175 Jaida Expressway",
+										"9": " Jacobitown Norfolk Island'",
+										"10": "0140-874-156"
+									},
+									{
+										"0": "386194",
+										"1": "Duane",
+										"3": "Davis",
+										"4": "Duane Davis",
+										"5": "Male",
+										"6": "54",
+										"7": "1965-11-10",
+										"8": "'98233 Raymond Courts",
+										"9": " East Nash Grenada'",
+										"10": "0333-211-412"
+									}
+								],
+								"schema": [
+									{
+										"key": "0",
+										"name": "CustomerId",
+										"type": "string"
+									},
+									{
+										"key": "1",
+										"name": "FirstName",
+										"type": "string"
+									},
+									{
+										"key": "2",
+										"name": "MiddleInitial",
+										"type": "string"
+									},
+									{
+										"key": "3",
+										"name": "LastName",
+										"type": "string"
+									},
+									{
+										"key": "4",
+										"name": "FullName",
+										"type": "string"
+									},
+									{
+										"key": "5",
+										"name": "Gender",
+										"type": "string"
+									},
+									{
+										"key": "6",
+										"name": "Age",
+										"type": "string"
+									},
+									{
+										"key": "7",
+										"name": "BirthDate",
+										"type": "string"
+									},
+									{
+										"key": "8",
+										"name": "Address",
+										"type": "string"
+									},
+									{
+										"key": "9",
+										"name": "Mobile",
+										"type": "string"
+									},
+									{
+										"key": "10",
+										"name": "Email",
+										"type": "string"
+									}
+								],
+								"truncated": false
+							},
+							"isSummary": false,
+							"language": "scala"
+						},
+						"persist_state": {
+							"view": {
+								"type": "details",
+								"chartOptions": {
+									"chartType": "bar",
+									"aggregationType": "count",
+									"categoryFieldKeys": [
+										"0"
+									],
+									"seriesFieldKeys": [
+										"0"
+									],
+									"isStacked": false
+								}
+							}
+						}
+					},
+					"6d71ca3a-12ee-4970-b1fb-f7aa8ffc007e": {
+						"type": "Synapse.DataFrame",
+						"sync_state": {
+							"table": {
+								"rows": [
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "1325",
+										"3": 3,
+										"4": "31.320000000000000000",
+										"5": "93.960000000000000000",
+										"6": "20191201",
+										"7": "26.190000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2879",
+										"3": 4,
+										"4": "27.760000000000000000",
+										"5": "111.040000000000000000",
+										"6": "20191201",
+										"7": "31.320000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "541",
+										"3": 1,
+										"4": "26.910000000000000000",
+										"5": "26.910000000000000000",
+										"6": "20191201",
+										"7": "6.830000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2879",
+										"3": 2,
+										"4": "27.760000000000000000",
+										"5": "55.520000000000000000",
+										"6": "20191201",
+										"7": "15.660000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "4486",
+										"3": 4,
+										"4": "27.510000000000000000",
+										"5": "110.040000000000000000",
+										"6": "20191201",
+										"7": "31.360000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2879",
+										"3": 2,
+										"4": "27.760000000000000000",
+										"5": "55.520000000000000000",
+										"6": "20191201",
+										"7": "15.660000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "4651",
+										"3": 2,
+										"4": "32.800000000000000000",
+										"5": "65.600000000000000000",
+										"6": "20191201",
+										"7": "24.660000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2423",
+										"3": 2,
+										"4": "28.310000000000000000",
+										"5": "56.620000000000000000",
+										"6": "20191201",
+										"7": "14.580000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "3627",
+										"3": 2,
+										"4": "27.420000000000000000",
+										"5": "54.840000000000000000",
+										"6": "20191201",
+										"7": "20.780000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "635",
+										"3": 4,
+										"4": "27.940000000000000000",
+										"5": "111.760000000000000000",
+										"6": "20191201",
+										"7": "33.560000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									}
+								],
+								"schema": [
+									{
+										"key": "0",
+										"name": "TransactionId",
+										"type": "string"
+									},
+									{
+										"key": "1",
+										"name": "CustomerId",
+										"type": "int"
+									},
+									{
+										"key": "2",
+										"name": "ProductId",
+										"type": "smallint"
+									},
+									{
+										"key": "3",
+										"name": "Quantity",
+										"type": "tinyint"
+									},
+									{
+										"key": "4",
+										"name": "Price",
+										"type": "decimal"
+									},
+									{
+										"key": "5",
+										"name": "TotalAmount",
+										"type": "decimal"
+									},
+									{
+										"key": "6",
+										"name": "TransactionDate",
+										"type": "int"
+									},
+									{
+										"key": "7",
+										"name": "ProfitAmount",
+										"type": "decimal"
+									},
+									{
+										"key": "8",
+										"name": "Hour",
+										"type": "tinyint"
+									},
+									{
+										"key": "9",
+										"name": "Minute",
+										"type": "tinyint"
+									},
+									{
+										"key": "10",
+										"name": "StoreId",
+										"type": "smallint"
+									}
+								],
+								"truncated": false
+							},
+							"isSummary": false,
+							"language": "scala"
+						},
+						"persist_state": {
+							"view": {
+								"type": "details",
+								"chartOptions": {
+									"chartType": "bar",
+									"aggregationType": "sum",
+									"categoryFieldKeys": [
+										"0"
+									],
+									"seriesFieldKeys": [
+										"1"
+									],
+									"isStacked": false
+								}
+							}
+						}
+					}
+				}
+			},
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Using Hyperspace for indexing in Synapse Spark\r\n",
+					"\r\n",
+					"Hyperspace introduces the ability for Apache Spark users to create indexes on their datasets, such as CSV, JSON, and Parquet, and use them for potential query and workload acceleration.\r\n",
+					"\r\n",
+					"Hyperspace helps accelerate your workloads or queries under two circumstances:\r\n",
+					"\r\n",
+					"- Queries contain filters on predicates with high selectivity. For example, you might want to select 100 matching rows from a million candidate rows.\r\n",
+					"- Queries contain a join that requires heavy shuffles. For example, you might want to join a 100-GB dataset with a 10-GB dataset."
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"By default, Spark uses broadcast join to optimize join queries when the data size for one side of join is small (which is the case for the sample data we use in this tutorial). Therefore, we disable broadcast joins so that later when we run join queries, Spark uses sort-merge join. This is mainly to show how Hyperspace indexes would be used at scale for accelerating join queries."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Disable BroadcastHashJoin, so Spark will use standard SortMergeJoin. Currently, Hyperspace indexes utilize SortMergeJoin to speed up query.\r\n",
+					"spark.conf.set(\"spark.sql.autoBroadcastJoinThreshold\", -1)\r\n",
+					"\r\n",
+					"# Verify that BroadcastHashJoin is set correctly \r\n",
+					"print(spark.conf.get(\"spark.sql.autoBroadcastJoinThreshold\"))"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Load customer data into a Spark dataframe."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"df_customer = spark.read.load('abfss://wwi-02@dataairawdls.dfs.core.windows.net/data-generators/generator-customer.csv', format='csv', header=True)\r\n",
+					"display(df_customer.limit(10))"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Load sales data into a Spark dataframe."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": false
+				},
+				"source": [
+					"df_sales = spark.read.load('abfss://wwi-02@dataairawdls.dfs.core.windows.net/sale-small/Year=2019/Quarter=Q4/Month=12/*/sale-small-20191201-snappy.parquet', format='parquet')\r\n",
+					"display(df_sales.limit(10))"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Initialize the Hyperspace engine in the Spark session."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from hyperspace import *  \r\n",
+					"from com.microsoft.hyperspace import *\r\n",
+					"from com.microsoft.hyperspace.index import *\r\n",
+					"\r\n",
+					"# Create an instance of Hyperspace\r\n",
+					"hyperspace = Hyperspace(spark)"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Create index configurations for customer and sales data as follows:\r\n",
+					"- The customer index is built on the `CustomerId` column and also includes (covers) column `BirthDate`\r\n",
+					"- The sales index is built on the `CustomerId` column and also includes (covers) columns `ProductId` and `Quantity`\r\n",
+					"\r\n",
+					"Using the index configurations, create the actual indexes on the customer and sales dataframes."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"customer_index_config = IndexConfig(\"customerIndex1\", [\"CustomerId\"], [\"BirthDate\"])\r\n",
+					"sales_index_config = IndexConfig(\"salesIndex1\", [\"CustomerId\"], [\"ProductId\", \"Quantity\"])\r\n",
+					"\r\n",
+					"hyperspace.createIndex(df_customer, customer_index_config)\r\n",
+					"hyperspace.createIndex(df_sales, sales_index_config)"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Enumerate all available indexes."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"hyperspace.indexes().show()"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Check the data lake location of the first index from the list."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"hyperspace.indexes().first().indexLocation"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Hyperspace provides APIs to enable or disable index usage with Spark.\r\n",
+					"\r\n",
+					"- By using the **hyperspace.enable()** command, Hyperspace optimization rules become visible to the Spark optimizer and exploit existing Hyperspace indexes to optimize user queries.\r\n",
+					"- By using the **hyperspace.disable()** command, Hyperspace rules no longer apply during query optimization. Disabling Hyperspace has no impact on created indexes because they remain intact.\r\n",
+					"\r\n",
+					"Enable hyperspace on the current Spark session."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"hyperspace.enable(spark)"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Currently, Hyperspace has rules to exploit indexes for two groups of queries:\r\n",
+					"\r\n",
+					"- Selection queries with lookup or range selection filtering predicates.\r\n",
+					"- Join queries with an equality join predicate (that is, equijoins).\r\n",
+					"\r\n",
+					"Observe the impact of Hyperspace on range selection. Start with a filtering predicate followed by a selection that contains columns not covered by the index."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"sales_filter = df_sales.filter('CustomerId = 85100').select(['CustomerId', 'TransactionDate'])\r\n",
+					"sales_filter.show()"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Observe the impact of the Hyperspace index. Note how the physical plan scans the actual data files (this happens because `TransactionDate` is not covered by the index, thus it needs to be loaded from the original data)."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"spark.conf.set(\"spark.hyperspace.explain.displayMode\", \"html\")\r\n",
+					"\r\n",
+					"hyperspace.explain(sales_filter, True, displayHTML)"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Perform the same filtering but with a selection that is covered by the index."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"sales_filter = df_sales.filter('CustomerId == 85100').select(['CustomerId', 'ProductId', 'Quantity'])\r\n",
+					"sales_filter.show()"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Observe how the plan relies now in the Hyperspace index for execution."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"hyperspace.explain(sales_filter, True, displayHTML)"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Perform a join between the customer and sales dataframes."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"customers_sales_join = df_customer.join(df_sales, df_customer.CustomerId == df_sales.CustomerId).select(df_sales.CustomerId, df_sales.ProductId, df_customer.BirthDate, df_sales.Quantity)\r\n",
+					"customers_sales_join.show()"
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Observe the impact of both indexes in the execution plan."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"hyperspace.explain(customers_sales_join, True, displayHTML)"
+				],
+				"execution_count": 17
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			}
+		]
+	}
+}

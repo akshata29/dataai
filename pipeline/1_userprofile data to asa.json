@@ -1,0 +1,45 @@
+{
+	"name": "1_userprofile data to asa",
+	"properties": {
+		"description": "Make sure to execute 2_otherdata scripts",
+		"activities": [
+			{
+				"name": "user_profile_data",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "2_asal_writeuserprofiledatatoasa",
+						"type": "DataFlowReference"
+					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "dataairawdls",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "wwi-02/staginguserprofiles"
+					},
+					"integrationRuntime": {
+						"referenceName": "dataaiir",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "WideWorldImport/02_other data"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-10-30T02:00:52Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

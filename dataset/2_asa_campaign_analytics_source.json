@@ -1,0 +1,52 @@
+{
+	"name": "2_asa_campaign_analytics_source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataairawdls",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "WideWorldImporter/2_other data"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "campaignanalytics.csv",
+				"folderPath": "campaign-analytics",
+				"fileSystem": "wwi-02"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

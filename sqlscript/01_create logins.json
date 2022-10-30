@@ -1,0 +1,20 @@
+{
+	"name": "01_create logins",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/00_setup"
+		},
+		"content": {
+			"query": "create login [asa.sql.workload01] with password = 'P2ssw0rd2903$'\ncreate login [asa.sql.workload02] with password = 'P2ssw0rd2903$'\ncreate login [asa.sql.import01] with password = 'P2ssw0rd2903$'\ncreate login [asa.sql.import02] with password = 'P2ssw0rd2903$'\ncreate login [asa.sql.highperf] with password = 'P2ssw0rd2903$'\ncreate login [asa.sql.admin] with password = 'P2ssw0rd2903$'",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "dataaidw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

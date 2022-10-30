@@ -1,0 +1,20 @@
+{
+	"name": "2_workload monitoring",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/06_monitoring"
+		},
+		"content": {
+			"query": "-- Azure Synapse Analytics provides a rich monitoring experience within the Azure portal to surface insights regarding your \n-- data warehouse workload. The Azure portal is the recommended tool when monitoring your data warehouse as it provides \n-- configurable retention periods, alerts, recommendations, and customizable charts and dashboards for metrics and logs. \n-- The portal also enables you to integrate with other Azure monitoring services such as Azure Monitor (logs) with \n-- Log analytics to provide a holistic monitoring experience for not only your data warehouse but also your entire \n-- Azure analytics platform for an integrated monitoring experience.\n\n--All queries executed on SQL pool are logged to sys.dm_pdw_exec_requests. This DMV contains the last 10,000 queries executed. \n-- The request_id uniquely identifies each query and is the primary key for this DMV. The request_id is assigned sequentially\n--  for each new query and is prefixed with QID, which stands for query ID. Querying this DMV for a given session_id \n-- shows all queries for a given logon.\nSELECT * FROM sys.dm_pdw_exec_sessions where status <> 'Closed' and session_id <> session_id();\n\n--Let's flood the system with queries to create operations to monitor. To do this, we will run a Azure Synapse Pipeline which \n-- triggers queries. Select the Integrate hub. Run the Lab 08 - Execute Business Analyst Queries Pipeline, which will run / trigger\n--  asa.sql.workload02 queries. Please let this pipeline run for 30 seconds to one minute, then cancel it recursively.\n\nSELECT *\nFROM sys.dm_pdw_exec_requests\nWHERE status not in ('Completed','Failed','Cancelled')\n  AND session_id <> session_id()\nORDER BY submit_time DESC;\n\n--As an alternative, you can execute the following SQL command to find the top 10 longest running queries.\nSELECT TOP 10 *\nFROM sys.dm_pdw_exec_requests\nORDER BY total_elapsed_time DESC;\n\n--To simplify the lookup of a query in the sys.dm_pdw_exec_requests table, use LABEL to assign a comment to your query, \n--which can be looked up in the sys.dm_pdw_exec_requests view. To test using the labels, replace the script in the query \n--window with the following:\nSELECT *\nFROM sys.tables\nOPTION (LABEL = 'My Query');\n\n-- Find a query with the Label 'My Query'\n-- Use brackets when querying the label column, as it it a key word\nSELECT  *\nFROM sys.dm_pdw_exec_requests\nWHERE [label] = 'My Query';\n\n--In the query window, replace the script with the following to retrieve the query's distributed SQL (DSQL) plan from \n--sys.dm_pdw_request_steps. Be sure to replace the QID##### with the Request_ID you noted in Step 12:\nSELECT * FROM sys.dm_pdw_request_steps\nWHERE request_id = 'QID4990'\nORDER BY step_index;\n\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dataaidw",
+				"poolName": "dataaidw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

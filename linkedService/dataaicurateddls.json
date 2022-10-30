@@ -1,0 +1,15 @@
+{
+	"name": "dataaicurateddls",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://dataaicurateddls.dfs.core.windows.net"
+		},
+		"connectVia": {
+			"referenceName": "dataaiir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

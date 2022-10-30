@@ -1,0 +1,20 @@
+{
+	"name": "0_query parquet",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/01_sales data"
+		},
+		"content": {
+			"query": "-- Perform aggregates and grouping operations to better understand the data.\nSELECT\n    TransactionDate, ProductId,\n        CAST(SUM(ProfitAmount) AS decimal(18,2)) AS [(sum) Profit],\n        CAST(AVG(ProfitAmount) AS decimal(18,2)) AS [(avg) Profit],\n        SUM(Quantity) AS [(sum) Quantity]\nFROM\n    OPENROWSET(\n        BULK 'https://dataairawdls.dfs.core.windows.net/wwi-02/sale-small/Year=2016/Quarter=Q4/Month=12/Day=20161231/sale-small-20161231-snappy.parquet',\n        FORMAT='PARQUET'\n    ) AS [r] GROUP BY r.TransactionDate, r.ProductId;\n\n\n-- How many records are contained within the Parquet files for 2019 data. \n-- This information is important for planning how we optimize for importing the data into Azure Synapse Analytics.\nSELECT\n    COUNT(*)\nFROM\n    OPENROWSET(\n        BULK 'https://dataairawdls.dfs.core.windows.net/wwi-02/sale-small/Year=2019/*/*/*/*',\n        FORMAT='PARQUET'\n    ) AS [r];",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

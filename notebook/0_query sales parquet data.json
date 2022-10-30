@@ -1,0 +1,450 @@
+{
+	"name": "0_query sales parquet data",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImporter/01_sales data"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"runAsWorkspaceSystemIdentity": false,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "7cc02e69-ad5b-4b28-b7ef-15f7f0e663a5"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net",
+					"authHeader": null
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"extraHeader": null
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"df = spark.read.load(\"abfss://wwi-02@dataairawdls.dfs.core.windows.net/sale-small/Year=2010/Quarter=Q4/Month=12\")\r\n",
+					"display(df.limit(10))"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df.printSchema()"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql import SparkSession\r\n",
+					"from pyspark.sql.types import *\r\n",
+					"from pyspark.sql.functions import *\r\n",
+					"\r\n",
+					"profitByDateProduct = (df.groupBy(\"TransactionDate\",\"ProductId\")\r\n",
+					"    .agg(\r\n",
+					"        sum(\"ProfitAmount\").alias(\"(sum)ProfitAmount\"),\r\n",
+					"        round(avg(\"Quantity\"), 4).alias(\"(avg)Quantity\"),\r\n",
+					"        sum(\"Quantity\").alias(\"(sum)Quantity\"))\r\n",
+					"    .orderBy(\"TransactionDate\"))\r\n",
+					"profitByDateProduct.show(100)"
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"In addition to the sales data, we have customer profile data from an e-commerce system that provides top product purchases for each visitor of the site (customer) over the past 12 months. This data is stored within JSON files in the data lake. We will import this data in the next lab, but let's explore it while we're in the Spark notebook."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df = (spark.read \\\r\n",
+					"        .option(\"inferSchema\", \"true\") \\\r\n",
+					"        .json(\"abfss://wwi-02@dataairawdls.dfs.core.windows.net/online-user-profiles-02/*.json\", multiLine=True)\r\n",
+					"    )\r\n",
+					"\r\n",
+					"df.printSchema()"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# create a view called user_profiles\r\n",
+					"df.createOrReplaceTempView(\"user_profiles\")"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Notice that we are selecting all JSON files within the online-user-profiles-02 directory. Each JSON file contains several rows, which is why we specified the multiLine=True option. Also, we set the inferSchema option to true, which instructs the Spark engine to review the files and create a schema based on the nature of the data."
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"We have been using Python code in these cells up to this point. If we want to query the files using SQL syntax, one option is to create a temporary view of the data within the dataframe. Execute the following in a new cell to create a view named user_profiles:"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql\r\n",
+					"\r\n",
+					"SELECT * FROM user_profiles LIMIT 10"
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Notice that the output shows nested data for topProductPurchases, which includes an array of productId and itemsPurchasedLast12Months values. You can expand the fields by clicking the right triangle in each row."
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"PySpark contains a special explode function, which returns a new row for each element of the array. This will help flatten the topProductPurchases column for better readability or for easier querying. Execute the following in a new cell:"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql.functions import udf, explode\r\n",
+					"\r\n",
+					"flat=df.select('visitorId',explode('topProductPurchases').alias('topProductPurchases_flat'))\r\n",
+					"flat.show(100)"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"topPurchases = (flat.select('visitorId','topProductPurchases_flat.productId','topProductPurchases_flat.itemsPurchasedLast12Months')\r\n",
+					"    .orderBy('visitorId'))\r\n",
+					"\r\n",
+					"topPurchases.show(100)"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"In the output, notice that we now have multiple rows for each visitorId."
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Let's order by the number of items purchased in the last 12 months\r\n",
+					"sortedTopPurchases = topPurchases.orderBy(\"itemsPurchasedLast12Months\")\r\n",
+					"\r\n",
+					"sortedTopPurchases.show(100)"
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"topPurchases.orderBy(\"itemsPurchasedLast12Months desc\")"
+				],
+				"execution_count": 12
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"Notice that there is an AnalysisException error, because itemsPurchasedLast12Months desc does not match up with a column name.\r\n",
+					"\r\n",
+					"Why does this not work?\r\n",
+					"\r\n",
+					"- The DataFrames API is built upon an SQL engine.\r\n",
+					"- There is a lot of familiarity with this API and SQL syntax in general.\r\n",
+					"- The problem is that orderBy(..) expects the name of the column.\r\n",
+					"- What we specified was an SQL expression in the form of requests desc.\r\n",
+					"- What we need is a way to programmatically express such an expression.\r\n",
+					"- This leads us to the second variant, orderBy(Column) and more specifically, the class Column"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"sortedTopPurchases = (topPurchases\r\n",
+					"    .orderBy( col(\"itemsPurchasedLast12Months\").desc() ))\r\n",
+					"\r\n",
+					"sortedTopPurchases.show(100)"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"groupedTopPurchases = (sortedTopPurchases.select(\"visitorId\")\r\n",
+					"    .groupBy(\"visitorId\")\r\n",
+					"    .agg(count(\"*\").alias(\"total\"))\r\n",
+					"    .orderBy(\"visitorId\") )\r\n",
+					"\r\n",
+					"groupedTopPurchases.show(100)"
+				],
+				"execution_count": 14
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"groupedTopPurchases = (sortedTopPurchases.select(\"visitorId\",\"itemsPurchasedLast12Months\")\r\n",
+					"    .groupBy(\"visitorId\")\r\n",
+					"    .agg(sum(\"itemsPurchasedLast12Months\").alias(\"totalItemsPurchased\"))\r\n",
+					"    .orderBy(\"visitorId\") )\r\n",
+					"\r\n",
+					"groupedTopPurchases.show(100)"
+				],
+				"execution_count": 15
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			}
+		]
+	}
+}

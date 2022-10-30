@@ -1,0 +1,20 @@
+{
+	"name": "0_verify workload",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/06_monitoring"
+		},
+		"content": {
+			"query": "--First, let's confirm that there are no queries currently being run by users logged in workload01 or workload02\n\nSELECT s.login_name, r.[Status], r.Importance, submit_time, \nstart_time ,s.session_id FROM sys.dm_pdw_exec_sessions s \nJOIN sys.dm_pdw_exec_requests r ON s.session_id = r.session_id\nWHERE s.login_name IN ('asa.sql.workload01','asa.sql.workload02') and Importance\nis not NULL AND r.[status] in ('Running','Suspended') \n--and submit_time>dateadd(minute,-2,getdate())\nORDER BY submit_time ,s.login_name\n\n\n-- Execute 1_Execute Business Analyst and CEO Pipeline\n-- Let's see what happened to all the queries we just triggered as they flood the system. Return to the query window, \n-- replace the script with the following:\n\nSELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s \nJOIN sys.dm_pdw_exec_requests r ON s.session_id = r.session_id\nWHERE s.login_name IN ('asa.sql.workload01','asa.sql.workload02') \nand Importance is not NULL AND r.[status] in ('Running','Suspended') and submit_time>dateadd(minute,-2,getdate())\nORDER BY submit_time ,status\n\nIF EXISTS (SELECT * FROM sys.workload_management_workload_classifiers WHERE name = 'CEO')\nBEGIN\n    DROP WORKLOAD CLASSIFIER CEO;\nEND\nCREATE WORKLOAD CLASSIFIER CEO\n  WITH (WORKLOAD_GROUP = 'largerc'\n  ,MEMBERNAME = 'asa.sql.workload01',IMPORTANCE = High);\n\n\nSELECT s.login_name, r.[Status], r.Importance, submit_time, start_time ,s.session_id FROM sys.dm_pdw_exec_sessions s \nJOIN sys.dm_pdw_exec_requests r ON s.session_id = r.session_id\nWHERE s.login_name IN ('asa.sql.workload01','asa.sql.workload02') and Importance\nis not NULL AND r.[status] in ('Running','Suspended') and submit_time>dateadd(minute,-2,getdate())\nORDER BY submit_time ,status desc",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dataaidw",
+				"poolName": "dataaidw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

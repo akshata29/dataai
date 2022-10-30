@@ -1,0 +1,20 @@
+{
+	"name": "2_import sales data using pipeline",
+	"properties": {
+		"folder": {
+			"name": "WideWorldImport/01_sales data"
+		},
+		"content": {
+			"query": "-- Now that WWI has gone through the process of loading data using PolyBase and COPY via T-SQL statements, \n-- it's time for them to experiment with loading sales data through a Synapse pipeline.\n\n-- When moving data into a data warehouse, there is oftentimes a level of orchestration involved, \n-- coordinating movement from one or more data sources and sometimes some level of transformation. \n-- The transformation step can occur during (extract-transform-load - ETL) or \n-- after (extract-load-transform - ELT) data movement. Any modern data platform must provide \n-- a seamless experience for all the typical data wrangling actions like extractions, parsing,\n--  joining, standardizing, augmenting, cleansing, consolidating, and filtering. \n-- Azure Synapse Analytics provides two significant categories of features - data flows and \n-- data orchestrations (implemented as pipelines).\n\n-- Configure workload management classification\n-- When loading a large amount of data, it is best to run only one load job at a time for fastest performance. \n-- If this isn't possible, run a minimal number of loads concurrently. If you expect a large loading job, \n-- consider scaling up your SQL pool before the load.\n\n-- Be sure that you allocate enough memory to the pipeline session. To do this, increase the resource class\n--  of a user which has permissions to rebuild the index on this table to the recommended minimum.\n\n-- To run loads with appropriate compute resources, create loading users designated for running loads. \n-- Assign each loading user to a specific resource class or workload group. To run a load, \n-- sign in as one of the loading users, and then run the load. The load runs with the user's resource class.\n\nIF NOT EXISTS (SELECT * FROM sys.workload_management_workload_classifiers WHERE group_name = 'BigDataLoad')\nBEGIN\n    CREATE WORKLOAD GROUP BigDataLoad WITH  \n    (\n        MIN_PERCENTAGE_RESOURCE = 50 -- integer value\n        ,REQUEST_MIN_RESOURCE_GRANT_PERCENT = 25 --  (guaranteed a minimum of 4 concurrency)\n        ,CAP_PERCENTAGE_RESOURCE = 100\n    );\nEND\n\n-- HeavyLoader that assigns the asa.sql.import01 user we created in your environment to the BigDataLoad workload group.\nIF NOT EXISTS (SELECT * FROM sys.workload_management_workload_classifiers WHERE [name] = 'HeavyLoader')\nBEGIN\n    CREATE WORKLOAD Classifier HeavyLoader WITH\n    (\n        Workload_Group ='BigDataLoad',\n        MemberName='asa.sql.import01',\n        IMPORTANCE = HIGH\n    );\nEND\n\nSELECT * FROM sys.workload_management_workload_classifiers\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "dataaidw",
+				"poolName": "dataaidw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

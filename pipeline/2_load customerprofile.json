@@ -1,0 +1,58 @@
+{
+	"name": "2_load customerprofile",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy Customer Profile Data to Cosmos DB",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"wildcardFolderPath": "online-user-profiles-01",
+							"wildcardFileName": "*.json",
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "CosmosDbSqlApiSink",
+						"writeBehavior": "insert"
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "0_wwi02_online_user_profiles_01_adal",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "0_customer_profile_cosmosdb",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "WideWorldImport/00_setup"
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-10-30T01:58:50Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}

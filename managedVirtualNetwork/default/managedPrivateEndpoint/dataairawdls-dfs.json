@@ -1,0 +1,10 @@
+{
+	"name": "dataairawdls-dfs",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls",
+		"groupId": "dfs",
+		"fqdns": [
+			"dataairawdls.dfs.core.windows.net"
+		]
+	}
+}

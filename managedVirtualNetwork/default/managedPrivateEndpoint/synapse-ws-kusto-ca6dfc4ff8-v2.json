@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-kusto-ca6dfc4ff8-v2",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks",
+		"groupId": "Kusto",
+		"fqdns": [
+			"dataaiadx.dataaisynapsewks.kusto.azuresynapse.net"
+		]
+	}
+}

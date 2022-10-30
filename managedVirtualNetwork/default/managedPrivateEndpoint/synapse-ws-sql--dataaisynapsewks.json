@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-sql--dataaisynapsewks",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks",
+		"groupId": "sql",
+		"fqdns": [
+			"dataaisynapsewks.ca6dfc4f-f8c8-44a3-b709-926d2f9ba561.sql.azuresynapse.net"
+		]
+	}
+}

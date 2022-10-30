@@ -1,0 +1,57 @@
+{
+	"name": "0_wwi02_online_user_profiles_01_adal",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataairawdls",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "WideWorldImporter/0_loading"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "*.json",
+				"folderPath": "online-user-profiles-01",
+				"fileSystem": "wwi-02"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"userId": {
+					"type": "integer"
+				},
+				"cartId": {
+					"type": "string"
+				},
+				"preferredProducts": {
+					"type": "array",
+					"items": {
+						"type": "integer"
+					}
+				},
+				"productReviews": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"productId": {
+								"type": "integer"
+							},
+							"reviewText": {
+								"type": "string"
+							},
+							"reviewDate": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
