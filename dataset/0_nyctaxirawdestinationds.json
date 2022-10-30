@@ -1,5 +1,5 @@
 {
-	"name": "0_nyctaxireferencedestds",
+	"name": "0_nyctaxirawdestinationds",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dataairawdls",
@@ -13,7 +13,14 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "nyctaxi-staging/referencedata",
+				"fileName": {
+					"value": "@{variables('nycTaxiRelativeUrl')}",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "nyctaxi-staging/transactional-data/type=@{variables('nycTaxiType')}/year=@{item().Year}/month=@{item().Month}/",
+					"type": "Expression"
+				},
 				"fileSystem": "nyctaxi"
 			}
 		}

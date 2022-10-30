@@ -1,8 +1,8 @@
 {
-	"name": "0_nyctaxireferencedestds",
+	"name": "0_nyctaxihttpsourceds",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "dataairawdls",
+			"referenceName": "dataainychttp",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
@@ -12,9 +12,11 @@
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
-				"folderPath": "nyctaxi-staging/referencedata",
-				"fileSystem": "nyctaxi"
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@{variables('nycTaxiRelativeUrl')}",
+					"type": "Expression"
+				}
 			}
 		}
 	},

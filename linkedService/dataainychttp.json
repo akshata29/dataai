@@ -1,0 +1,17 @@
+{
+	"name": "dataainychttp",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "https://d37ci6vzurychx.cloudfront.net/trip-data/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		},
+		"connectVia": {
+			"referenceName": "dataaiir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

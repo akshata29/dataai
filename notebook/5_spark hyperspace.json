@@ -26,6 +26,435 @@
 		},
 		"metadata": {
 			"saveOutput": true,
+			"synapse_widget": {
+				"version": "0.1",
+				"state": {
+					"dc6f0b41-2d54-4441-9b5e-66a73477c95e": {
+						"type": "Synapse.DataFrame",
+						"sync_state": {
+							"table": {
+								"rows": [
+									{
+										"0": "386185",
+										"1": "Daisy",
+										"3": "Mueller",
+										"4": "Daisy Mueller",
+										"5": "Female",
+										"6": "60",
+										"7": "1960-05-05",
+										"8": "'35157 Elbert Hills",
+										"9": " South Evans Norway'",
+										"10": "0128-494-538"
+									},
+									{
+										"0": "386186",
+										"1": "Valerie",
+										"2": "O",
+										"3": "Gaylord",
+										"4": "Valerie O. Gaylord",
+										"5": "Female",
+										"6": "53",
+										"7": "1966-07-25",
+										"8": "'32569 Pietro Estate",
+										"9": " Lake Judahhaven Belize'",
+										"10": "0919-373-342"
+									},
+									{
+										"0": "386187",
+										"1": "Penny",
+										"3": "Botsford",
+										"4": "Penny Botsford",
+										"5": "Female",
+										"6": "54",
+										"7": "1965-09-09",
+										"8": "'36804 Katheryn Throughway",
+										"9": " Mazieport Taiwan'",
+										"10": "0571-252-751"
+									},
+									{
+										"0": "386188",
+										"1": "Larry",
+										"2": "D",
+										"3": "Kling",
+										"4": "Larry D. Kling",
+										"5": "Male",
+										"6": "53",
+										"7": "1966-08-20",
+										"8": "'49344 Jerel Falls",
+										"9": " West Jeanie Poland'",
+										"10": "0772-618-876"
+									},
+									{
+										"0": "386189",
+										"1": "Joy",
+										"2": "Q",
+										"3": "Schmidt",
+										"4": "Joy Q. Schmidt",
+										"5": "Female",
+										"6": "52",
+										"7": "1968-05-02",
+										"8": "'60337 Gorczany Cliffs",
+										"9": " South Kayden Ireland'",
+										"10": "0521-684-423"
+									},
+									{
+										"0": "386190",
+										"1": "Cheryl",
+										"3": "Langosh",
+										"4": "Cheryl Langosh",
+										"5": "Female",
+										"6": "40",
+										"7": "1979-07-13",
+										"8": "'92411 Chadrick Mall",
+										"9": " Constantinshire Zimbabwe'",
+										"10": "0874-664-271"
+									},
+									{
+										"0": "386191",
+										"1": "Ross",
+										"3": "Rohan",
+										"4": "Ross Rohan",
+										"5": "Male",
+										"6": "50",
+										"7": "1969-11-02",
+										"8": "'99138 VonRueden Pine",
+										"9": " Burleychester Ghana'",
+										"10": "0391-493-953"
+									},
+									{
+										"0": "386192",
+										"1": "Johnny",
+										"3": "Armstrong",
+										"4": "Johnny Armstrong",
+										"5": "Male",
+										"6": "49",
+										"7": "1970-09-01",
+										"8": "'91936 Haven Shore",
+										"9": " South Florencemouth United Kingdom'",
+										"10": "0134-597-510"
+									},
+									{
+										"0": "386193",
+										"1": "Teresa",
+										"2": "E",
+										"3": "Dibbert",
+										"4": "Teresa E. Dibbert",
+										"5": "Female",
+										"6": "48",
+										"7": "1971-12-01",
+										"8": "'43175 Jaida Expressway",
+										"9": " Jacobitown Norfolk Island'",
+										"10": "0140-874-156"
+									},
+									{
+										"0": "386194",
+										"1": "Duane",
+										"3": "Davis",
+										"4": "Duane Davis",
+										"5": "Male",
+										"6": "54",
+										"7": "1965-11-10",
+										"8": "'98233 Raymond Courts",
+										"9": " East Nash Grenada'",
+										"10": "0333-211-412"
+									}
+								],
+								"schema": [
+									{
+										"key": "0",
+										"name": "CustomerId",
+										"type": "string"
+									},
+									{
+										"key": "1",
+										"name": "FirstName",
+										"type": "string"
+									},
+									{
+										"key": "2",
+										"name": "MiddleInitial",
+										"type": "string"
+									},
+									{
+										"key": "3",
+										"name": "LastName",
+										"type": "string"
+									},
+									{
+										"key": "4",
+										"name": "FullName",
+										"type": "string"
+									},
+									{
+										"key": "5",
+										"name": "Gender",
+										"type": "string"
+									},
+									{
+										"key": "6",
+										"name": "Age",
+										"type": "string"
+									},
+									{
+										"key": "7",
+										"name": "BirthDate",
+										"type": "string"
+									},
+									{
+										"key": "8",
+										"name": "Address",
+										"type": "string"
+									},
+									{
+										"key": "9",
+										"name": "Mobile",
+										"type": "string"
+									},
+									{
+										"key": "10",
+										"name": "Email",
+										"type": "string"
+									}
+								],
+								"truncated": false
+							},
+							"isSummary": false,
+							"language": "scala"
+						},
+						"persist_state": {
+							"view": {
+								"type": "details",
+								"chartOptions": {
+									"chartType": "bar",
+									"aggregationType": "count",
+									"categoryFieldKeys": [
+										"0"
+									],
+									"seriesFieldKeys": [
+										"0"
+									],
+									"isStacked": false
+								}
+							}
+						}
+					},
+					"6d71ca3a-12ee-4970-b1fb-f7aa8ffc007e": {
+						"type": "Synapse.DataFrame",
+						"sync_state": {
+							"table": {
+								"rows": [
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "1325",
+										"3": 3,
+										"4": "31.320000000000000000",
+										"5": "93.960000000000000000",
+										"6": "20191201",
+										"7": "26.190000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2879",
+										"3": 4,
+										"4": "27.760000000000000000",
+										"5": "111.040000000000000000",
+										"6": "20191201",
+										"7": "31.320000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "541",
+										"3": 1,
+										"4": "26.910000000000000000",
+										"5": "26.910000000000000000",
+										"6": "20191201",
+										"7": "6.830000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2879",
+										"3": 2,
+										"4": "27.760000000000000000",
+										"5": "55.520000000000000000",
+										"6": "20191201",
+										"7": "15.660000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "4486",
+										"3": 4,
+										"4": "27.510000000000000000",
+										"5": "110.040000000000000000",
+										"6": "20191201",
+										"7": "31.360000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2879",
+										"3": 2,
+										"4": "27.760000000000000000",
+										"5": "55.520000000000000000",
+										"6": "20191201",
+										"7": "15.660000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "4651",
+										"3": 2,
+										"4": "32.800000000000000000",
+										"5": "65.600000000000000000",
+										"6": "20191201",
+										"7": "24.660000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "2423",
+										"3": 2,
+										"4": "28.310000000000000000",
+										"5": "56.620000000000000000",
+										"6": "20191201",
+										"7": "14.580000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "3627",
+										"3": 2,
+										"4": "27.420000000000000000",
+										"5": "54.840000000000000000",
+										"6": "20191201",
+										"7": "20.780000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									},
+									{
+										"0": "e9d917d0-f1fd-4ef3-a0a3-c51a2f361d4a",
+										"1": "22",
+										"2": "635",
+										"3": 4,
+										"4": "27.940000000000000000",
+										"5": "111.760000000000000000",
+										"6": "20191201",
+										"7": "33.560000000000000000",
+										"8": 17,
+										"9": 37,
+										"10": "5302"
+									}
+								],
+								"schema": [
+									{
+										"key": "0",
+										"name": "TransactionId",
+										"type": "string"
+									},
+									{
+										"key": "1",
+										"name": "CustomerId",
+										"type": "int"
+									},
+									{
+										"key": "2",
+										"name": "ProductId",
+										"type": "smallint"
+									},
+									{
+										"key": "3",
+										"name": "Quantity",
+										"type": "tinyint"
+									},
+									{
+										"key": "4",
+										"name": "Price",
+										"type": "decimal"
+									},
+									{
+										"key": "5",
+										"name": "TotalAmount",
+										"type": "decimal"
+									},
+									{
+										"key": "6",
+										"name": "TransactionDate",
+										"type": "int"
+									},
+									{
+										"key": "7",
+										"name": "ProfitAmount",
+										"type": "decimal"
+									},
+									{
+										"key": "8",
+										"name": "Hour",
+										"type": "tinyint"
+									},
+									{
+										"key": "9",
+										"name": "Minute",
+										"type": "tinyint"
+									},
+									{
+										"key": "10",
+										"name": "StoreId",
+										"type": "smallint"
+									}
+								],
+								"truncated": false
+							},
+							"isSummary": false,
+							"language": "scala"
+						},
+						"persist_state": {
+							"view": {
+								"type": "details",
+								"chartOptions": {
+									"chartType": "bar",
+									"aggregationType": "sum",
+									"categoryFieldKeys": [
+										"0"
+									],
+									"seriesFieldKeys": [
+										"1"
+									],
+									"isStacked": false
+								}
+							}
+						}
+					}
+				}
+			},
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",

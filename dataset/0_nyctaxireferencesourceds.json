@@ -15,5 +15,6 @@
 				"type": "FileServerLocation"
 			}
 		}
-	}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
 }

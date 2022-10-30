@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "WideWorldImporter/1_import sales data"
+			"name": "WideWorldImport/1_import sales data"
 		},
 		"annotations": [],
 		"type": "AzureSqlDWTable",

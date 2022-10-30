@@ -1,22 +1,24 @@
 {
-	"name": "0_nyctaxireferencedestds",
+	"name": "1_nyctaxirawyellowds",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dataairawdls",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "NycTaxi/0_SourceToStaging"
+			"name": "NycTaxi/1_StagingToRaw/Raw/YellowTaxi"
 		},
 		"annotations": [],
-		"type": "Binary",
+		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "nyctaxi-staging/referencedata",
+				"folderPath": "nyctaxi-raw-df/transactions/yellow-taxi",
 				"fileSystem": "nyctaxi"
-			}
-		}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
 	},
 	"type": "Microsoft.Synapse/workspaces/datasets"
 }

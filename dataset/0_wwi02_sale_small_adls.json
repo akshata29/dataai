@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "WideWorldImporter/0_loading"
+			"name": "WideWorldImport/0_loading"
 		},
 		"annotations": [],
 		"type": "Parquet",

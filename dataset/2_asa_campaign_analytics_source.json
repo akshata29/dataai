@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "WideWorldImporter/2_other data"
+			"name": "WideWorldImport/2_other data"
 		},
 		"annotations": [],
 		"type": "DelimitedText",

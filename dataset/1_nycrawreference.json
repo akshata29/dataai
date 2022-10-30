@@ -1,19 +1,19 @@
 {
-	"name": "0_nyctaxireferencedestds",
+	"name": "1_nycrawreference",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dataairawdls",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "NycTaxi/0_SourceToStaging"
+			"name": "NycTaxi/1_StagingToRaw/Raw/Reference"
 		},
 		"annotations": [],
 		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "nyctaxi-staging/referencedata",
+				"folderPath": "nyctaxi-raw-df/reference",
 				"fileSystem": "nyctaxi"
 			}
 		}
