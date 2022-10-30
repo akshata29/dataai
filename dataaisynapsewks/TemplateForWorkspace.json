@@ -3883,7 +3883,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "WorldWideImport/0_Loading"
+					"name": "WideWorldImport/03_monitoring"
 				},
 				"annotations": [],
 				"type": "AzureSqlDWTable",
