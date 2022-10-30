@@ -1994,6 +1994,386 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/2_GreenTaxiRawToCurated')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "2_GreenTaxiRawToCurated",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Cleanup Directories",
+								"dependencyConditions": [
+									"Succeeded",
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "2_nycrawtocuratedgreentaxidf",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"RawGreenTaxi": {},
+									"RawPaymentType": {},
+									"RawRateCode": {},
+									"RawTaxiZone": {},
+									"RawVendor": {},
+									"RawTripType": {},
+									"RawTripMonth": {},
+									"SinkToCuratedZone": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Cleanup Directories",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedgreentaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							}
+						}
+					},
+					{
+						"name": "Delete committed Files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Delete success files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedgreentaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_committed*"
+							}
+						}
+					},
+					{
+						"name": "Delete started Files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "2_GreenTaxiRawToCurated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedgreentaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_started*"
+							}
+						}
+					},
+					{
+						"name": "Delete success files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Delete started Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedgreentaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_SUCCESS*"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "NycTaxi/2_RawToCurated"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-08-25T18:39:43Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/2_nycrawtocuratedgreentaxidf')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nyccuratedgreentaxi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_YellowTaxiRawToCurated')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "2_YellowTaxiRawToCurated",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Cleanup Directories",
+								"dependencyConditions": [
+									"Succeeded",
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "2_nycrawtocuratedyellowtaxidf",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"RawYellowTaxi": {},
+									"RawPaymentType": {},
+									"RawRateCode": {},
+									"RawTaxiZone": {},
+									"RawVendor": {},
+									"RawTripType": {},
+									"RawTripMonth": {},
+									"SinkToCuratedZone": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Cleanup Directories",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedyellowtaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							}
+						}
+					},
+					{
+						"name": "Delete committed Files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Delete success files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedyellowtaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_committed*"
+							}
+						}
+					},
+					{
+						"name": "Delete started Files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "2_YellowTaxiRawToCurated",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedyellowtaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_started*"
+							}
+						}
+					},
+					{
+						"name": "Delete success files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Delete started Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "2_nyccuratedyellowtaxi",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_SUCCESS*"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "NycTaxi/2_RawToCurated"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-08-28T02:18:07Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/2_nycrawtocuratedyellowtaxidf')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nyccuratedyellowtaxi')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/2_load customerprofile')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -2060,6 +2440,191 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/0_wwi02_online_user_profiles_01_adal')]",
 				"[concat(variables('workspaceId'), '/datasets/0_customer_profile_cosmosdb')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/3_CuratedToConsumption')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "3_CuratedToConsumptiondf",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Cleanup Directories",
+								"dependencyConditions": [
+									"Succeeded",
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "3_nyccuratedtoconsumptiondf",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"YellowTaxi": {},
+									"GreenTaxi": {},
+									"SinkToConsumption": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Cleanup Directories",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "3_nycconsumption",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true
+							}
+						}
+					},
+					{
+						"name": "Delete committed Files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Delete success files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "3_nycconsumption",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_committed*"
+							}
+						}
+					},
+					{
+						"name": "Delete started Files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "3_CuratedToConsumptiondf",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "3_nycconsumption",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_started*"
+							}
+						}
+					},
+					{
+						"name": "Delete success files",
+						"type": "Delete",
+						"dependsOn": [
+							{
+								"activity": "Delete started Files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "3_nycconsumption",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"wildcardFileName": "_SUCCESS*"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "NycTaxi/3_CuratedToConsumption"
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-08-28T15:28:51Z"
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/3_nyccuratedtoconsumptiondf')]",
+				"[concat(variables('workspaceId'), '/datasets/3_nycconsumption')]"
 			]
 		},
 		{
@@ -8107,6 +8672,34 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/3_nycconsumption')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataaicurateddls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/3_CuratedToConsumption"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "nyctaxi-consumption-df/transactions/materialized-view",
+						"fileSystem": "nyctaxi"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataaicurateddls')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/dataaianomalydetector')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -13007,6 +13600,318 @@
 				"[concat(variables('workspaceId'), '/datasets/2_asa_ecommerce_userprofiles_source')]",
 				"[concat(variables('workspaceId'), '/datasets/2_customer_profile_cosmosdb')]",
 				"[concat(variables('workspaceId'), '/datasets/2_asa_wwi_usertopproductpurchases_asa')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_nycrawtocuratedgreentaxidf')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi/2_RawToCurated"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "2_nycrawgreentaxi",
+								"type": "DatasetReference"
+							},
+							"name": "RawGreenTaxi"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawpaymenttype",
+								"type": "DatasetReference"
+							},
+							"name": "RawPaymentType"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawratecode",
+								"type": "DatasetReference"
+							},
+							"name": "RawRateCode"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawtaxizone",
+								"type": "DatasetReference"
+							},
+							"name": "RawTaxiZone"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawvendor",
+								"type": "DatasetReference"
+							},
+							"name": "RawVendor"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawtriptype",
+								"type": "DatasetReference"
+							},
+							"name": "RawTripType"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawtripmonth",
+								"type": "DatasetReference"
+							},
+							"name": "RawTripMonth"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "SinkToCuratedZone"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectGreenTaxiColumns",
+							"description": "Select deduped trips"
+						},
+						{
+							"name": "DerivedColumnsGreenTaxi",
+							"description": "Add derived columns + columns with literal values"
+						},
+						{
+							"name": "JoinWithPaymentType"
+						},
+						{
+							"name": "JoinWithRateZone"
+						},
+						{
+							"name": "JoinWithTaxiZoneForPickup"
+						},
+						{
+							"name": "ReorderAndRenamePickupZone"
+						},
+						{
+							"name": "JoinWithTaxiZoneForDropOff"
+						},
+						{
+							"name": "ReorderAndRenameDropoffZone"
+						},
+						{
+							"name": "JoinWithVendor"
+						},
+						{
+							"name": "FinalColumnList"
+						},
+						{
+							"name": "JoinWithTripType"
+						},
+						{
+							"name": "JoinWithTripMonth"
+						}
+					],
+					"script": "source(output(\n\t\tvendor_id as long,\n\t\tpickup_datetime as timestamp,\n\t\tdropoff_datetime as timestamp,\n\t\tstore_and_fwd_flag as string,\n\t\trate_code_id as double,\n\t\tpickup_location_id as long,\n\t\tdropoff_location_id as long,\n\t\tpassenger_count as double,\n\t\ttrip_distance as double,\n\t\tfare_amount as double,\n\t\textra as double,\n\t\tmta_tax as double,\n\t\ttip_amount as double,\n\t\ttolls_amount as double,\n\t\tehail_fee as integer,\n\t\timprovement_surcharge as double,\n\t\ttotal_amount as double,\n\t\tpayment_type as double,\n\t\ttrip_type as double,\n\t\tcongestion_surcharge as double,\n\t\ttaxi_type as string,\n\t\ttrip_year as integer,\n\t\ttrip_month as integer\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\trowUrlColumn: 'dataset_file_nm',\n\tformat: 'parquet',\n\twildcardPaths:['nyctaxi-raw-df/transactions/green-taxi/*/*/*.parquet']) ~> RawGreenTaxi\nsource(output(\n\t\tpayment_type as short,\n\t\tabbreviation as string,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawPaymentType\nsource(output(\n\t\trate_code_id as short,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawRateCode\nsource(output(\n\t\tLocationID as string,\n\t\tBorough as string,\n\t\tZone as string,\n\t\tservice_zone as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawTaxiZone\nsource(output(\n\t\tvendor_id as short,\n\t\tabbreviation as string,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawVendor\nsource(output(\n\t\ttrip_type as integer,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawTripType\nsource(output(\n\t\ttrip_month as string,\n\t\tmonth_name_short as string,\n\t\tmonth_name_full as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawTripMonth\nRawGreenTaxi select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type,\n\t\tdataset_file_nm\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectGreenTaxiColumns\nSelectGreenTaxiColumns derive(pickup_year = year(pickup_datetime),\n\t\tpickup_month = month(pickup_datetime),\n\t\tpickup_day = dayOfWeek(pickup_datetime),\n\t\tpickup_hour = hour(pickup_datetime),\n\t\tpickup_minute = minute(pickup_datetime),\n\t\tpickup_second = second(pickup_datetime),\n\t\tdropoff_year = year(dropoff_datetime),\n\t\tdropoff_month = month(dropoff_datetime),\n\t\tdropoff_day = dayOfWeek(dropoff_datetime),\n\t\tdropoff_hour = hour(dropoff_datetime),\n\t\tdropoff_minute = minute(dropoff_datetime),\n\t\tdropoff_second = second(dropoff_datetime),\n\t\ttrip_year = toInteger(left(toString(pickup_datetime),4)),\n\t\ttrip_month = toInteger(substring(toString(pickup_datetime), 6, 2))) ~> DerivedColumnsGreenTaxi\nDerivedColumnsGreenTaxi, RawPaymentType join(SelectGreenTaxiColumns@payment_type == RawPaymentType@payment_type,\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithPaymentType\nJoinWithTripMonth, RawRateCode join(SelectGreenTaxiColumns@rate_code_id == RawRateCode@rate_code_id,\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithRateZone\nJoinWithRateZone, RawTaxiZone join(pickup_location_id == toInteger(LocationID),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithTaxiZoneForPickup\nJoinWithTaxiZoneForPickup select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id = SelectGreenTaxiColumns@rate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type = SelectGreenTaxiColumns@payment_type,\n\t\ttrip_type = SelectGreenTaxiColumns@trip_type,\n\t\tcongestion_surcharge,\n\t\tdataset_file_nm,\n\t\ttrip_year,\n\t\ttrip_month = DerivedColumnsGreenTaxi@trip_month,\n\t\ttaxi_type,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\tpayment_type_description = RawPaymentType@description,\n\t\trate_code_description = RawRateCode@description,\n\t\tpickup_borough = Borough,\n\t\tpickup_zone = Zone,\n\t\tpickup_service_zone = service_zone,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\ttrip_type_description = RawTripType@description\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> ReorderAndRenamePickupZone\nReorderAndRenamePickupZone, RawTaxiZone join(dropoff_location_id == toInteger(LocationID),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithTaxiZoneForDropOff\nJoinWithTaxiZoneForDropOff select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type,\n\t\tdataset_file_nm,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\tpayment_type_description,\n\t\trate_code_description,\n\t\tpickup_borough,\n\t\tpickup_zone,\n\t\tpickup_service_zone,\n\t\tdropoff_borough = Borough,\n\t\tdropoff_zone = Zone,\n\t\tdropoff_service_zone = service_zone,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\ttrip_type_description\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> ReorderAndRenameDropoffZone\nReorderAndRenameDropoffZone, RawVendor join(ReorderAndRenameDropoffZone@vendor_id == RawVendor@vendor_id,\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithVendor\nJoinWithVendor select(mapColumn(\n\t\tvendor_id = ReorderAndRenameDropoffZone@vendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\tvendor_abbreviation = abbreviation,\n\t\tvendor_description = description,\n\t\ttrip_type_description,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\tpayment_type_description,\n\t\trate_code_description,\n\t\tpickup_borough,\n\t\tpickup_zone,\n\t\tpickup_service_zone,\n\t\tdropoff_borough,\n\t\tdropoff_zone,\n\t\tdropoff_service_zone,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type,\n\t\tdataset_file_nm\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> FinalColumnList\nJoinWithPaymentType, RawTripType join(SelectGreenTaxiColumns@trip_type == RawTripType@trip_type,\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'auto')~> JoinWithTripType\nJoinWithTripType, RawTripMonth join(DerivedColumnsGreenTaxi@trip_month == toInteger(RawTripMonth@trip_month),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'auto')~> JoinWithTripMonth\nFinalColumnList sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tcompressionType: 'snappy',\n\tcompressionLevel: 'Fastest',\n\tfileSystem: 'nyctaxi',\n\tfolderPath: 'nyctaxi-curated-df/transactions/green-taxi',\n\tmergeSchema: true,\n\tautoCompact: true,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tumask: 0022,\n\tpreCommands: [],\n\tpostCommands: [],\n\tpartitionBy('key',\n\t\t0,\n\t\ttrip_year,\n\t\ttrip_month\n\t)) ~> SinkToCuratedZone"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawgreentaxi')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawpaymenttype')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawratecode')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawtaxizone')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawvendor')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawtriptype')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawtripmonth')]",
+				"[concat(variables('workspaceId'), '/linkedServices/dataaicurateddls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_nycrawtocuratedyellowtaxidf')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi/2_RawToCurated"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "2_nycrawyellowtaxi",
+								"type": "DatasetReference"
+							},
+							"name": "RawYellowTaxi"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawpaymenttype",
+								"type": "DatasetReference"
+							},
+							"name": "RawPaymentType"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawratecode",
+								"type": "DatasetReference"
+							},
+							"name": "RawRateCode"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawtaxizone",
+								"type": "DatasetReference"
+							},
+							"name": "RawTaxiZone"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawvendor",
+								"type": "DatasetReference"
+							},
+							"name": "RawVendor"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawtriptype",
+								"type": "DatasetReference"
+							},
+							"name": "RawTripType"
+						},
+						{
+							"dataset": {
+								"referenceName": "2_nycrawtripmonth",
+								"type": "DatasetReference"
+							},
+							"name": "RawTripMonth"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "SinkToCuratedZone"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectYellowTaxiColumns",
+							"description": "Select deduped trips"
+						},
+						{
+							"name": "DerivedColumnsYellowTaxi",
+							"description": "Add derived columns + columns with literal values"
+						},
+						{
+							"name": "JoinWithPaymentType"
+						},
+						{
+							"name": "JoinWithRateZone"
+						},
+						{
+							"name": "JoinWithTaxiZoneForPickup"
+						},
+						{
+							"name": "ReorderAndRenamePickupZone"
+						},
+						{
+							"name": "JoinWithTaxiZoneForDropOff"
+						},
+						{
+							"name": "ReorderAndRenameDropoffZone"
+						},
+						{
+							"name": "JoinWithVendor"
+						},
+						{
+							"name": "FinalColumnList"
+						},
+						{
+							"name": "JoinWithTripType"
+						},
+						{
+							"name": "JoinWithTripMonth"
+						}
+					],
+					"script": "source(output(\n\t\tvendor_id as string,\n\t\tpickup_datetime as timestamp,\n\t\tdropoff_datetime as timestamp,\n\t\tstore_and_fwd_flag as string,\n\t\trate_code_id as double,\n\t\tpickup_location_id as long,\n\t\tdropoff_location_id as long,\n\t\tpickup_longitude as double,\n\t\tpickup_latitude as double,\n\t\tdropoff_longitude as double,\n\t\tdropoff_latitude as double,\n\t\tpassenger_count as double,\n\t\ttrip_distance as double,\n\t\tfare_amount as double,\n\t\textra as double,\n\t\tmta_tax as double,\n\t\ttip_amount as double,\n\t\ttolls_amount as double,\n\t\tehail_fee as integer,\n\t\timprovement_surcharge as double,\n\t\ttotal_amount as double,\n\t\tpayment_type as string,\n\t\ttrip_type as double,\n\t\tcongestion_surcharge as double,\n\t\tsurcharge as double,\n\t\tairport_fee as double,\n\t\ttaxi_type as string,\n\t\ttrip_year as string,\n\t\ttrip_month as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\trowUrlColumn: 'dataset_file_nm',\n\tformat: 'parquet',\n\twildcardPaths:['nyctaxi-raw-df/transactions/yellow-taxi/*/*/*.parquet']) ~> RawYellowTaxi\nsource(output(\n\t\tpayment_type as short,\n\t\tabbreviation as string,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawPaymentType\nsource(output(\n\t\trate_code_id as short,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawRateCode\nsource(output(\n\t\tLocationID as string,\n\t\tBorough as string,\n\t\tZone as string,\n\t\tservice_zone as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawTaxiZone\nsource(output(\n\t\tvendor_id as short,\n\t\tabbreviation as string,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawVendor\nsource(output(\n\t\ttrip_type as integer,\n\t\tdescription as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawTripType\nsource(output(\n\t\ttrip_month as string,\n\t\tmonth_name_short as string,\n\t\tmonth_name_full as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'parquet') ~> RawTripMonth\nRawYellowTaxi select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type,\n\t\tdataset_file_nm,\n\t\tairport_fee,\n\t\tsurcharge,\n\t\tpickup_longitude,\n\t\tpickup_latitude,\n\t\tdropoff_longitude,\n\t\tdropoff_latitude\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectYellowTaxiColumns\nSelectYellowTaxiColumns derive(pickup_year = year(pickup_datetime),\n\t\tpickup_month = month(pickup_datetime),\n\t\tpickup_day = dayOfWeek(pickup_datetime),\n\t\tpickup_hour = hour(pickup_datetime),\n\t\tpickup_minute = minute(pickup_datetime),\n\t\tpickup_second = second(pickup_datetime),\n\t\tdropoff_year = year(dropoff_datetime),\n\t\tdropoff_month = month(dropoff_datetime),\n\t\tdropoff_day = dayOfWeek(dropoff_datetime),\n\t\tdropoff_hour = hour(dropoff_datetime),\n\t\tdropoff_minute = minute(dropoff_datetime),\n\t\tdropoff_second = second(dropoff_datetime),\n\t\ttrip_year = substring(dataset_file_nm,(instr(dataset_file_nm, 'trip_year=')+10),4),\n\t\ttrip_month = replace(substring(dataset_file_nm,(instr(dataset_file_nm, 'trip_month=')+11),2), '/', '')) ~> DerivedColumnsYellowTaxi\nDerivedColumnsYellowTaxi, RawPaymentType join(SelectYellowTaxiColumns@payment_type == toString(RawPaymentType@payment_type),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithPaymentType\nJoinWithTripMonth, RawRateCode join(SelectYellowTaxiColumns@rate_code_id == RawRateCode@rate_code_id,\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithRateZone\nJoinWithRateZone, RawTaxiZone join(pickup_location_id == toInteger(LocationID),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithTaxiZoneForPickup\nJoinWithTaxiZoneForPickup select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id = SelectYellowTaxiColumns@rate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type = SelectYellowTaxiColumns@payment_type,\n\t\ttrip_type = SelectYellowTaxiColumns@trip_type,\n\t\tcongestion_surcharge,\n\t\tdataset_file_nm,\n\t\ttrip_year,\n\t\ttrip_month = DerivedColumnsYellowTaxi@trip_month,\n\t\ttaxi_type,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\tpayment_type_description = RawPaymentType@description,\n\t\trate_code_description = RawRateCode@description,\n\t\tpickup_borough = Borough,\n\t\tpickup_zone = Zone,\n\t\tpickup_service_zone = service_zone,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\ttrip_type_description = RawTripType@description,\n\t\tsurcharge,\n\t\tairport_fee,\n\t\tpickup_longitude,\n\t\tpickup_latitude,\n\t\tdropoff_longitude,\n\t\tdropoff_latitude,\n\t\tLocationID,\n\t\tabbreviation\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ReorderAndRenamePickupZone\nReorderAndRenamePickupZone, RawTaxiZone join(dropoff_location_id == toInteger(RawTaxiZone@LocationID),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithTaxiZoneForDropOff\nJoinWithTaxiZoneForDropOff select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type,\n\t\tdataset_file_nm,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\tpayment_type_description,\n\t\trate_code_description,\n\t\tpickup_borough,\n\t\tpickup_zone,\n\t\tpickup_service_zone,\n\t\tdropoff_borough = Borough,\n\t\tdropoff_zone = Zone,\n\t\tdropoff_service_zone = service_zone,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\ttrip_type_description,\n\t\tabbreviation,\n\t\tdropoff_longitude,\n\t\tdropoff_latitude,\n\t\tpickup_longitude,\n\t\tpickup_latitude,\n\t\tairport_fee,\n\t\tsurcharge\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> ReorderAndRenameDropoffZone\nReorderAndRenameDropoffZone, RawVendor join(ReorderAndRenameDropoffZone@vendor_id == toString(RawVendor@vendor_id),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'right')~> JoinWithVendor\nJoinWithVendor select(mapColumn(\n\t\tvendor_id = ReorderAndRenameDropoffZone@vendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpickup_longitude,\n\t\tpickup_latitude,\n\t\tdropoff_longitude,\n\t\tdropoff_latitude,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\tsurcharge,\n\t\tairport_fee,\n\t\tvendor_abbreviation = RawVendor@abbreviation,\n\t\tvendor_description = description,\n\t\ttrip_type_description,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\tpayment_type_description,\n\t\trate_code_description,\n\t\tpickup_borough,\n\t\tpickup_zone,\n\t\tpickup_service_zone,\n\t\tdropoff_borough,\n\t\tdropoff_zone,\n\t\tdropoff_service_zone,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type,\n\t\tdataset_file_nm\n\t),\n\tskipDuplicateMapInputs: false,\n\tskipDuplicateMapOutputs: false) ~> FinalColumnList\nJoinWithPaymentType, RawTripType join(SelectYellowTaxiColumns@trip_type == RawTripType@trip_type,\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'auto')~> JoinWithTripType\nJoinWithTripType, RawTripMonth join(toInteger(DerivedColumnsYellowTaxi@trip_month) == toInteger(RawTripMonth@trip_month),\n\tjoinType:'left',\n\tmatchType:'exact',\n\tignoreSpaces: false,\n\tbroadcast: 'auto')~> JoinWithTripMonth\nFinalColumnList sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tcompressionType: 'snappy',\n\tcompressionLevel: 'Fastest',\n\tfileSystem: 'nyctaxi',\n\tfolderPath: 'nyctaxi-curated-df/transactions/yellow-taxi',\n\tmergeSchema: true,\n\tautoCompact: true,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tumask: 0022,\n\tpreCommands: [],\n\tpostCommands: [],\n\tpartitionBy('key',\n\t\t0,\n\t\ttrip_year,\n\t\ttrip_month\n\t)) ~> SinkToCuratedZone"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawyellowtaxi')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawpaymenttype')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawratecode')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawtaxizone')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawvendor')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawtriptype')]",
+				"[concat(variables('workspaceId'), '/datasets/2_nycrawtripmonth')]",
+				"[concat(variables('workspaceId'), '/linkedServices/dataaicurateddls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/3_nyccuratedtoconsumptiondf')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "NycTaxi/3_CuratedToConsumption"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "YellowTaxi"
+						},
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "GreenTaxi"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "SinkToConsumption"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DriftYellowTaxi",
+							"description": "Creates an explicit mapping for each drifted column"
+						},
+						{
+							"name": "DriftGreenTaxi",
+							"description": "Creates an explicit mapping for each drifted column"
+						},
+						{
+							"name": "FinalColumnsGreen"
+						},
+						{
+							"name": "FinalColumnsYellow"
+						},
+						{
+							"name": "UnionYellowGreen"
+						},
+						{
+							"name": "DerivedGreenTaxi"
+						}
+					],
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'delta',\n\tfileSystem: 'nyctaxi',\n\tfolderPath: 'nyctaxi-curated-df/transactions/yellow-taxi') ~> YellowTaxi\nsource(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false,\n\tformat: 'delta',\n\tfileSystem: 'nyctaxi',\n\tfolderPath: 'nyctaxi-curated-df/transactions/green-taxi') ~> GreenTaxi\nYellowTaxi derive(vendor_id = toString(byName('vendor_id')),\n\t\tpickup_datetime = toTimestamp(byName('pickup_datetime')),\n\t\tdropoff_datetime = toTimestamp(byName('dropoff_datetime')),\n\t\tstore_and_fwd_flag = toString(byName('store_and_fwd_flag')),\n\t\trate_code_id = toDouble(byName('rate_code_id')),\n\t\tpickup_location_id = toInteger(byName('pickup_location_id')),\n\t\tdropoff_location_id = toInteger(byName('dropoff_location_id')),\n\t\tpickup_longitude = toDouble(byName('pickup_longitude')),\n\t\tpickup_latitude = toDouble(byName('pickup_latitude')),\n\t\tdropoff_longitude = toDouble(byName('dropoff_longitude')),\n\t\tdropoff_latitude = toDouble(byName('dropoff_latitude')),\n\t\tpassenger_count = toDouble(byName('passenger_count')),\n\t\ttrip_distance = toDouble(byName('trip_distance')),\n\t\tfare_amount = toDouble(byName('fare_amount')),\n\t\textra = toDouble(byName('extra')),\n\t\tmta_tax = toDouble(byName('mta_tax')),\n\t\ttip_amount = toDouble(byName('tip_amount')),\n\t\ttolls_amount = toDouble(byName('tolls_amount')),\n\t\tehail_fee = toInteger(byName('ehal_fee')),\n\t\timprovement_surcharge = toDouble(byName('improvement_surcharge')),\n\t\ttotal_amount = toDouble(byName('total_amount')),\n\t\tpayment_type = toString(byName('payment_type')),\n\t\ttrip_type = toDouble(byName('trip_type')),\n\t\tcongestion_surcharge = toDouble(byName('congestion_surcharge')),\n\t\tsurcharge = toDouble(byName('surcharge')),\n\t\tairport_fee = toDouble(byName('airport_fee')),\n\t\tvendor_abbreviation = toString(byName('vendor_abbreviation')),\n\t\tvendor_description = toString(byName('vendor_description')),\n\t\ttrip_type_description = toString(byName('trip_type_description')),\n\t\tmonth_name_short = toString(byName('month_name_short')),\n\t\tmonth_name_full = toString(byName('month_name_full')),\n\t\tpayment_type_description = toString(byName('payment_type_description')),\n\t\trate_code_description = toString(byName('rate_code_description')),\n\t\tpickup_borough = toString(byName('pickup_borough')),\n\t\tpickup_zone = toString(byName('pickup_zone')),\n\t\tpickup_service_zone = toString(byName('pickup_service_zone')),\n\t\tdropoff_borough = toString(byName('dropoff_borough')),\n\t\tdropoff_zone = toString(byName('dropoff_zone')),\n\t\tdropoff_service_zone = toString(byName('dropoff_service_zone')),\n\t\tpickup_year = toInteger(byName('pickup_year')),\n\t\tpickup_month = toInteger(byName('pickup_month')),\n\t\tpickup_day = toInteger(byName('pickup_day')),\n\t\tpickup_hour = toInteger(byName('pickup_hour')),\n\t\tpickup_minute = toInteger(byName('pickup_minute')),\n\t\tpickup_second = toInteger(byName('pickup_second')),\n\t\tpickup_date = toDate(byName('pickup_date')),\n\t\tdropoff_year = toInteger(byName('dropoff_year')),\n\t\tdropoff_month = toInteger(byName('dropoff_month')),\n\t\tdropoff_day = toInteger(byName('dropoff_day')),\n\t\tdropoff_hour = toInteger(byName('dropoff_hour')),\n\t\tdropoff_minute = toInteger(byName('dropoff_minute')),\n\t\tdropoff_second = toInteger(byName('dropoff_second')),\n\t\tdropoff_date = toDate(byName('dropoff_date')),\n\t\ttrip_year = toInteger(byName('trip_year')),\n\t\ttrip_month = toInteger(byName('trip_month')),\n\t\ttaxi_type = toString(byName('taxi_type')),\n\t\tdataset_file_nm = toString(byName('dataset_file_nm'))) ~> DriftYellowTaxi\nGreenTaxi derive(taxi_type = toString(byName('taxi_type')),\n\t\tvendor_id = toString(byName('vendor_id')),\n\t\tpickup_datetime = toTimestamp(byName('pickup_datetime')),\n\t\tdropoff_datetime = toTimestamp(byName('dropoff_datetime')),\n\t\tstore_and_fwd_flag = toString(byName('store_and_fwd_flag')),\n\t\trate_code_id = toInteger(byName('rate_code_id')),\n\t\tpickup_location_id = toInteger(byName('pickup_location_id')),\n\t\tdropoff_location_id = toInteger(byName('dropoff_location_id')),\n\t\tpassenger_count = toDouble(byName('passenger_count')),\n\t\ttrip_distance = toDouble(byName('trip_distance')),\n\t\tfare_amount = toDouble(byName('fare_amount')),\n\t\textra = toDouble(byName('extra')),\n\t\tmta_tax = toDouble(byName('mta_tax')),\n\t\ttip_amount = toDouble(byName('tip_amount')),\n\t\ttolls_amount = toDouble(byName('tolls_amount')),\n\t\tehail_fee = toInteger(byName('ehail_fee')),\n\t\timprovement_surcharge = toDouble(byName('improvement_surcharge')),\n\t\ttotal_amount = toDouble(byName('total_amount')),\n\t\tpayment_type = toString(byName('payment_type')),\n\t\ttrip_type = toDouble(byName('trip_type')),\n\t\tvendor_abbreviation = toString(byName('vendor_abbreviation')),\n\t\tvendor_description = toString(byName('vendor_description')),\n\t\ttrip_type_description = toString(byName('trip_type_description')),\n\t\tmonth_name_short = toString(byName('month_name_short')),\n\t\tmonth_name_full = toString(byName('month_name_full')),\n\t\tpayment_type_description = toString(byName('payment_type_description')),\n\t\trate_code_description = toString(byName('rate_code_description')),\n\t\tpickup_borough = toString(byName('pickup_borough')),\n\t\tpickup_zone = toString(byName('pickup_zone')),\n\t\tpickup_service_zone = toString(byName('pickup_service_zone')),\n\t\tdropoff_borough = toString(byName('dropoff_borough')),\n\t\tdropoff_zone = toString(byName('dropoff_zone')),\n\t\tdropoff_service_zone = toString(byName('dropoff_service_zone')),\n\t\tpickup_year = toInteger(byName('pickup_year')),\n\t\tpickup_month = toInteger(byName('pickup_month')),\n\t\tpickup_day = toInteger(byName('pickup_day')),\n\t\tpickup_hour = toInteger(byName('pickup_hour')),\n\t\tpickup_minute = toInteger(byName('pickup_minute')),\n\t\tpickup_second = toInteger(byName('pickup_second')),\n\t\tdropoff_year = toInteger(byName('dropoff_year')),\n\t\tdropoff_month = toInteger(byName('dropoff_month')),\n\t\tdropoff_day = toInteger(byName('dropoff_day')),\n\t\tdropoff_hour = toInteger(byName('dropoff_hour')),\n\t\tdropoff_minute = toInteger(byName('dropoff_minute')),\n\t\tdropoff_second = toInteger(byName('dropoff_second')),\n\t\tdataset_file_nm = toString(byName('dataset_file_nm')),\n\t\ttrip_year = toInteger(byName('trip_year')),\n\t\ttrip_month = toInteger(byName('trip_month')),\n\t\tcongestion_surcharge = toDouble(byName('congestion_surcharge'))) ~> DriftGreenTaxi\nDerivedGreenTaxi select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpickup_longitude,\n\t\tpickup_latitude,\n\t\tdropoff_longitude,\n\t\tdropoff_latitude,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\tsurcharge,\n\t\tairport_fee,\n\t\tvendor_abbreviation,\n\t\tvendor_description,\n\t\ttrip_type_description,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\tpayment_type_description,\n\t\trate_code_description,\n\t\tpickup_borough,\n\t\tpickup_zone,\n\t\tpickup_service_zone,\n\t\tdropoff_borough,\n\t\tdropoff_zone,\n\t\tdropoff_service_zone,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tpickup_date,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\tdropoff_date,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FinalColumnsGreen\nDriftYellowTaxi select(mapColumn(\n\t\tvendor_id,\n\t\tpickup_datetime,\n\t\tdropoff_datetime,\n\t\tstore_and_fwd_flag,\n\t\trate_code_id,\n\t\tpickup_location_id,\n\t\tdropoff_location_id,\n\t\tpickup_longitude,\n\t\tpickup_latitude,\n\t\tdropoff_longitude,\n\t\tdropoff_latitude,\n\t\tpassenger_count,\n\t\ttrip_distance,\n\t\tfare_amount,\n\t\textra,\n\t\tmta_tax,\n\t\ttip_amount,\n\t\ttolls_amount,\n\t\tehail_fee,\n\t\timprovement_surcharge,\n\t\ttotal_amount,\n\t\tpayment_type,\n\t\ttrip_type,\n\t\tcongestion_surcharge,\n\t\tsurcharge,\n\t\tairport_fee,\n\t\tvendor_abbreviation,\n\t\tvendor_description,\n\t\ttrip_type_description,\n\t\tmonth_name_short,\n\t\tmonth_name_full,\n\t\tpayment_type_description,\n\t\trate_code_description,\n\t\tpickup_borough,\n\t\tpickup_zone,\n\t\tpickup_service_zone,\n\t\tdropoff_borough,\n\t\tdropoff_zone,\n\t\tdropoff_service_zone,\n\t\tpickup_year,\n\t\tpickup_month,\n\t\tpickup_day,\n\t\tpickup_hour,\n\t\tpickup_minute,\n\t\tpickup_second,\n\t\tpickup_date,\n\t\tdropoff_year,\n\t\tdropoff_month,\n\t\tdropoff_day,\n\t\tdropoff_hour,\n\t\tdropoff_minute,\n\t\tdropoff_second,\n\t\tdropoff_date,\n\t\ttrip_year,\n\t\ttrip_month,\n\t\ttaxi_type\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FinalColumnsYellow\nFinalColumnsYellow, FinalColumnsGreen union(byName: true)~> UnionYellowGreen\nDriftGreenTaxi derive(pickup_longitude = toDouble('0'),\n\t\tpickup_latitude = toDouble('0'),\n\t\tdropoff_longitude = toDouble('0'),\n\t\tdropoff_latitude = toDouble('0'),\n\t\tairport_fee = toDouble('0'),\n\t\tsurcharge = toDouble('0'),\n\t\tpickup_date = toDate(pickup_datetime),\n\t\tdropoff_date = toDate(dropoff_datetime)) ~> DerivedGreenTaxi\nUnionYellowGreen sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'delta',\n\tfileSystem: 'nyctaxi',\n\tfolderPath: 'nyctaxi-consumption-df/transactions/materialized-view',\n\tmergeSchema: false,\n\tautoCompact: false,\n\toptimizedWrite: false,\n\tvacuum: 0,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tumask: 0022,\n\tpreCommands: [],\n\tpostCommands: [],\n\tpartitionBy('key',\n\t\t0,\n\t\ttaxi_type,\n\t\ttrip_year,\n\t\ttrip_month\n\t)) ~> SinkToConsumption"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataaicurateddls')]"
 			]
 		},
 		{
@@ -51947,18 +52852,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/dataai24spk')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -52003,6 +52896,18 @@
 				"sparkVersion": "3.2",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
