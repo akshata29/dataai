@@ -2261,6 +2261,268 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/1_nycstagingpaymenttype')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/Reference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "payment_type_lookup.csv",
+						"folderPath": "nyctaxi-staging/reference-data",
+						"fileSystem": "nyctaxi"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "payment_type",
+						"type": "String"
+					},
+					{
+						"name": "abbreviation",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nycstagingratecode')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/Reference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "rate_code_lookup.csv",
+						"folderPath": "nyctaxi-staging/reference-data",
+						"fileSystem": "nyctaxi"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "rate_code_id|description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nycstagingtaxizone')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/Reference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "taxi_zone_lookup.csv",
+						"folderPath": "nyctaxi-staging/reference-data",
+						"fileSystem": "nyctaxi"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "LocationID",
+						"type": "String"
+					},
+					{
+						"name": "Borough",
+						"type": "String"
+					},
+					{
+						"name": "Zone",
+						"type": "String"
+					},
+					{
+						"name": "service_zone",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nycstagingtripmonth')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/Reference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "trip_month_lookup.csv",
+						"folderPath": "nyctaxi-staging/reference-data",
+						"fileSystem": "nyctaxi"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Trip_Month",
+						"type": "String"
+					},
+					{
+						"name": "Month_Name_Short",
+						"type": "String"
+					},
+					{
+						"name": "Month_Name_Full",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nycstagingtriptype')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/Reference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "trip_type_lookup.csv",
+						"folderPath": "nyctaxi-staging/reference-data",
+						"fileSystem": "nyctaxi"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "trip_type",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nycstagingvendor')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/Reference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "vendor_lookup.csv",
+						"folderPath": "nyctaxi-staging/reference-data",
+						"fileSystem": "nyctaxi"
+					},
+					"columnDelimiter": "|",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "vendor_id",
+						"type": "String"
+					},
+					{
+						"name": "abbreviation",
+						"type": "String"
+					},
+					{
+						"name": "description",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/1_nyctaxirawgreends')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -2967,6 +3229,446 @@
 					{
 						"name": "trip_type",
 						"type": "INT64"
+					},
+					{
+						"name": "congestion_surcharge",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nyctaxistagegreends2017010207080911')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/GreenTaxi"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "nyctaxi-staging/transactional-data/type=green/year=2017",
+						"fileSystem": "nyctaxi"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "VendorID",
+						"type": "INT64"
+					},
+					{
+						"name": "lpep_pickup_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "lpep_dropoff_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "RatecodeID",
+						"type": "INT64"
+					},
+					{
+						"name": "PULocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "DOLocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "passenger_count",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_distance",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "fare_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "extra",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "mta_tax",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tip_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "ehail_fee",
+						"type": "INT32"
+					},
+					{
+						"name": "improvement_surcharge",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "total_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "payment_type",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_type",
+						"type": "INT64"
+					},
+					{
+						"name": "congestion_surcharge",
+						"type": "INT32"
+					},
+					{
+						"name": "month",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nyctaxistagegreends2017030405061012')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/GreenTaxi"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "nyctaxi-staging/transactional-data/type=green/year=2017/month=03",
+						"fileSystem": "nyctaxi"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "VendorID",
+						"type": "INT64"
+					},
+					{
+						"name": "lpep_pickup_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "lpep_dropoff_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "RatecodeID",
+						"type": "INT64"
+					},
+					{
+						"name": "PULocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "DOLocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "passenger_count",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_distance",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "fare_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "extra",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "mta_tax",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tip_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "ehail_fee",
+						"type": "INT32"
+					},
+					{
+						"name": "improvement_surcharge",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "total_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "payment_type",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_type",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "congestion_surcharge",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nyctaxistagegreends201802030506')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/GreenTaxi"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "nyctaxi-staging/transactional-data/type=green/year=2018/month=02",
+						"fileSystem": "nyctaxi"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "VendorID",
+						"type": "INT64"
+					},
+					{
+						"name": "lpep_pickup_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "lpep_dropoff_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "RatecodeID",
+						"type": "INT64"
+					},
+					{
+						"name": "PULocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "DOLocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "passenger_count",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_distance",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "fare_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "extra",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "mta_tax",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tip_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "ehail_fee",
+						"type": "INT32"
+					},
+					{
+						"name": "improvement_surcharge",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "total_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "payment_type",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_type",
+						"type": "INT64"
+					},
+					{
+						"name": "congestion_surcharge",
+						"type": "INT32"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_nyctaxistagegreends2018201401and04')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "dataairawdls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "NycTaxi/1_StagingToRaw/Staging/GreenTaxi"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "nyctaxi-staging/transactional-data/type=green/year=2018/month=01",
+						"fileSystem": "nyctaxi"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "VendorID",
+						"type": "INT64"
+					},
+					{
+						"name": "lpep_pickup_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "lpep_dropoff_datetime",
+						"type": "TIMESTAMP_MICROS"
+					},
+					{
+						"name": "store_and_fwd_flag",
+						"type": "UTF8"
+					},
+					{
+						"name": "RatecodeID",
+						"type": "INT64"
+					},
+					{
+						"name": "PULocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "DOLocationID",
+						"type": "INT64"
+					},
+					{
+						"name": "passenger_count",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_distance",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "fare_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "extra",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "mta_tax",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tip_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "tolls_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "ehail_fee",
+						"type": "INT32"
+					},
+					{
+						"name": "improvement_surcharge",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "total_amount",
+						"type": "DOUBLE"
+					},
+					{
+						"name": "payment_type",
+						"type": "INT64"
+					},
+					{
+						"name": "trip_type",
+						"type": "DOUBLE"
 					},
 					{
 						"name": "congestion_surcharge",
@@ -43279,6 +43981,18 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/dataai24spk')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -43323,18 +44037,6 @@
 				"sparkVersion": "3.2",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
