@@ -1,0 +1,19 @@
+{
+	"name": "0_nyctaxireferencesourceds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataaifile",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "NycTaxi/0_SourceToStaging"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation"
+			}
+		}
+	}
+}

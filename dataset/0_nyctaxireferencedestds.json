@@ -1,0 +1,21 @@
+{
+	"name": "0_nyctaxireferencedestds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataairawdls",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "NycTaxi/0_SourceToStaging"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "nyctaxi-staging/referencedata",
+				"fileSystem": "nyctaxi"
+			}
+		}
+	}
+}
