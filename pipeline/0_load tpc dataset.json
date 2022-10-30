@@ -44,7 +44,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "0_tpcdssmidw",
+									"referenceName": "tpcdssmidw",
 									"type": "DatasetReference",
 									"parameters": {
 										"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
@@ -80,7 +80,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "0_tpcdssmidw",
+						"referenceName": "tpcdssmidw",
 						"type": "DatasetReference",
 						"parameters": {
 							"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
@@ -120,7 +120,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "0_tpcdssmidw",
+						"referenceName": "tpcdssmidw",
 						"type": "DatasetReference",
 						"parameters": {
 							"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
@@ -174,7 +174,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "0_tpcdssmidw",
+									"referenceName": "tpcdssmidw",
 									"type": "DatasetReference",
 									"parameters": {
 										"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
@@ -232,7 +232,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "0_tpcdssmidw",
+									"referenceName": "tpcdssmidw",
 									"type": "DatasetReference",
 									"parameters": {
 										"ServerName": "dataaisynapsewks.sql.azuresynapse.net",

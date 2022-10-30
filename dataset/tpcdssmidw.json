@@ -1,5 +1,5 @@
 {
-	"name": "0_tpcdssmidw",
+	"name": "tpcdssmidw",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dataainsmidw",
