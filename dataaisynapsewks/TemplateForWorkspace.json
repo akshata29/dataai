@@ -857,7 +857,7 @@
 											"referenceName": "0_tpcdssmidw",
 											"type": "DatasetReference",
 											"parameters": {
-												"ServerName": "azsynapsewksash.sql.azuresynapse.net",
+												"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 												"DatabaseName": {
 													"value": "@pipeline().parameters.DatabaseName",
 													"type": "Expression"
@@ -893,7 +893,7 @@
 								"referenceName": "0_tpcdssmidw",
 								"type": "DatasetReference",
 								"parameters": {
-									"ServerName": "azsynapsewksash.sql.azuresynapse.net",
+									"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 									"DatabaseName": {
 										"value": "@pipeline().parameters.DatabaseName",
 										"type": "Expression"
@@ -933,6 +933,7 @@
 								"referenceName": "0_tpcdssmidw",
 								"type": "DatasetReference",
 								"parameters": {
+									"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 									"DatabaseName": {
 										"value": "@pipeline().parameters.DatabaseName",
 										"type": "Expression"
@@ -986,6 +987,7 @@
 											"referenceName": "0_tpcdssmidw",
 											"type": "DatasetReference",
 											"parameters": {
+												"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 												"DatabaseName": {
 													"value": "@pipeline().parameters.DatabaseName",
 													"type": "Expression"
@@ -1043,7 +1045,7 @@
 											"referenceName": "0_tpcdssmidw",
 											"type": "DatasetReference",
 											"parameters": {
-												"ServerName": "azsynapsewksash.sql.azuresynapse.net",
+												"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
 												"DatabaseName": {
 													"value": "@pipeline().parameters.DatabaseName",
 													"type": "Expression"
@@ -1126,7 +1128,7 @@
 				"parameters": {
 					"DatabaseName": {
 						"type": "string",
-						"defaultValue": "azsynapsetpc"
+						"defaultValue": "dataaitpcdw"
 					}
 				},
 				"variables": {
@@ -53532,6 +53534,30 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dataaitpcdw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/dataai24spk')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -53576,30 +53602,6 @@
 				"sparkVersion": "3.2",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaitpcdw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
