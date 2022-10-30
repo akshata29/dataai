@@ -1,0 +1,17 @@
+{
+	"name": "dataaifile",
+	"type": "Microsoft.Synapse/workspaces/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "D:\\repos\\nyctaxi\\reference-data",
+			"userId": "northamerica\\astalati",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI5ZjUzZjdhMy0zZjQ4LTQ3N2YtYjJlMy0zMjBjYjM3Y2U0NGIiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "dataaishir",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
