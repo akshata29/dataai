@@ -1,0 +1,33 @@
+{
+	"name": "0_tpcdssmidw",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataainsmidw",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"ServerName": "dataaisynapsewks.sql.azuresynapse.net",
+				"DatabaseName": "dataaitpcdw"
+			}
+		},
+		"parameters": {
+			"ServerName": {
+				"type": "string",
+				"defaultValue": "dataaisynapsewks.sql.azuresynapse.net"
+			},
+			"DatabaseName": {
+				"type": "string",
+				"defaultValue": "dataaitpcdw"
+			}
+		},
+		"folder": {
+			"name": "TpcBenchmark"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": " ",
+			"table": "azureadmin"
+		}
+	}
+}
