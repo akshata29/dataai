@@ -1,0 +1,20 @@
+{
+	"name": "4_create serverless db",
+	"properties": {
+		"folder": {
+			"name": "TpcBenchmark"
+		},
+		"content": {
+			"query": "-- Run against built-in serverless - master db\n\nIF NOT EXISTS (SELECT * FROM sys.DATABASES WHERE [name] = 'TPCDSDBDemo') \nCREATE DATABASE TPCDSDBDemo\nGO\n\nALTER DATABASE TPCDSDBDemo COLLATE Latin1_General_100_BIN2_UTF8\nGO\n\n--Database for external tables--\nIF NOT EXISTS (SELECT * FROM sys.DATABASES WHERE [name] = 'TPCDSDBExternal') \nCREATE DATABASE TPCDSDBExternal\nGO\n\nALTER DATABASE TPCDSDBExternal COLLATE Latin1_General_100_BIN2_UTF8\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

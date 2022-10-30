@@ -1,0 +1,20 @@
+{
+	"name": "_Reference Tpc",
+	"properties": {
+		"folder": {
+			"name": "TpcBenchmark"
+		},
+		"content": {
+			"query": "-- https://github.com/swanguni/Azure-Synapse-TPC-DS-Benchmark-Testing",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

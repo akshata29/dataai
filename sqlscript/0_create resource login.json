@@ -1,0 +1,20 @@
+{
+	"name": "0_create resource login",
+	"properties": {
+		"folder": {
+			"name": "TpcBenchmark"
+		},
+		"content": {
+			"query": "-- Parquet Auto Ingestion\n-- Create Logins for different Resource Classes\n-- Run against the tpcdw dedicated pool -> master db\nUSE [master]\nGO\n\nCREATE LOGIN LoadingUser WITH PASSWORD    = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc10 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc20 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc30 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc40 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc50 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc60 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc70 WITH PASSWORD = 'P2ssw0rd2903$'\nGO\nCREATE LOGIN Userstaticrc80 WITH PASSWORD = 'P2ssw0rd2903$'\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "dataaitpcdw"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

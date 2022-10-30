@@ -1,0 +1,20 @@
+{
+	"name": "5_create serverless login users",
+	"properties": {
+		"folder": {
+			"name": "TpcBenchmark"
+		},
+		"content": {
+			"query": "-- Run against multiple serverless db\n\nUSE [master]\nCREATE LOGIN LoadingUser WITH PASSWORD = 'P2ssw0rd2903$'\nGO\n\nUSE [TPCDSDBDemo]\nCREATE USER LoadingUser FOR LOGIN LoadingUser; \nGO \n\nALTER ROLE db_owner ADD MEMBER LoadingUser;\nGO\n\nCREATE SCHEMA TPCDS;\nGO\n\nUSE [TPCDSDBExternal]\nCREATE USER LoadingUser FOR LOGIN LoadingUser; \nGO \n\nALTER ROLE db_owner ADD MEMBER LoadingUser;\nGO\n\nCREATE SCHEMA TPCDS;\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "TPCDSDBExternal",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

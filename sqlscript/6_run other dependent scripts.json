@@ -1,0 +1,20 @@
+{
+	"name": "6_run other dependent scripts",
+	"properties": {
+		"folder": {
+			"name": "TpcBenchmark"
+		},
+		"content": {
+			"query": "-- Run Databricks notebook to generate TPCDS dataset in Azure Lake\n-- Run 0_Load Tpc Dataset Pipeline",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
