@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "Copy Reference Data",
+				"description": "Copy Reference Data from on-prem to Reference Folder",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
