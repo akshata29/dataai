@@ -1,0 +1,66 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "dataaisynapsewks"
+		},
+		"dataaicosmosdb_connectionString": {
+			"value": ""
+		},
+		"dataaidw_connectionString": {
+			"value": ""
+		},
+		"dataaidw_highperf_connectionString": {
+			"value": ""
+		},
+		"dataaidw_import01_connectionString": {
+			"value": ""
+		},
+		"dataaifile_password": {
+			"value": ""
+		},
+		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"dataaianomalydetector_properties_typeProperties_subscriptionId": {
+			"value": "e2171f6d-2650-45e6-af7e-6d6e44ca92b1"
+		},
+		"dataaicurateddls_properties_typeProperties_url": {
+			"value": "https://dataaicurateddls.dfs.core.windows.net"
+		},
+		"dataaifile_properties_typeProperties_host": {
+			"value": "D:\\repos\\nyctaxi\\reference-data"
+		},
+		"dataaifile_properties_typeProperties_userId": {
+			"value": "northamerica\\astalati"
+		},
+		"dataaikeyvault_properties_typeProperties_baseUrl": {
+			"value": "https://dataaikeyvault.vault.azure.net/"
+		},
+		"dataaimlwks_properties_typeProperties_subscriptionId": {
+			"value": "e2171f6d-2650-45e6-af7e-6d6e44ca92b1"
+		},
+		"dataaimlwks_properties_typeProperties_resourceGroupName": {
+			"value": "dataai"
+		},
+		"dataainychttp_properties_typeProperties_url": {
+			"value": "https://d37ci6vzurychx.cloudfront.net/trip-data/"
+		},
+		"dataairawdls_properties_typeProperties_url": {
+			"value": "https://dataairawdls.dfs.core.windows.net"
+		},
+		"dataaisynapsewks-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://dataaiwksdls.dfs.core.windows.net"
+		},
+		"dataaitextanalytics_properties_typeProperties_subscriptionId": {
+			"value": "e2171f6d-2650-45e6-af7e-6d6e44ca92b1"
+		},
+		"dataaiwksdls_properties_typeProperties_url": {
+			"value": "https://dataaiwksdls.dfs.core.windows.net"
+		},
+		"nyc_tlc_yellow_sasUri": {
+			"value": ""
+		}
+	}
+}
