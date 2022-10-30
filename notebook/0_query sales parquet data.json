@@ -2,7 +2,7 @@
 	"name": "0_query sales parquet data",
 	"properties": {
 		"folder": {
-			"name": "WideWorldImport/01_sales data"
+			"name": "WideWorldImporter/01_sales data"
 		},
 		"nbformat": 4,
 		"nbformat_minor": 2,
