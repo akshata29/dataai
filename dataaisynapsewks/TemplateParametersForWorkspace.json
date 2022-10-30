@@ -20,6 +20,9 @@
 		"dataaifile_password": {
 			"value": ""
 		},
+		"dataainsmidw_connectionString": {
+			"value": ""
+		},
 		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
