@@ -1,0 +1,24 @@
+{
+	"name": "2_nyccuratedgreentaxi",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "dataaicurateddls",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "NycTaxi/2_RawToCurated/Curated/GreenTaxi"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "nyctaxi-curated-df/transactions/green-taxi",
+				"fileSystem": "nyctaxi"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}
