@@ -14194,7 +14194,8 @@
 						"     format: 'table',",
 						"     staged: false,",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> CampaignAnalyticsASA"
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> CampaignAnalyticsASA"
 					]
 				}
 			},
@@ -14329,6 +14330,7 @@
 						"     allowCopyCommand: true,",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
 						"     mapColumn(",
 						"          UserId = userId,",
 						"          ProductId = productId,",
@@ -15699,6 +15701,81 @@
 					"resultLimit": 5000
 				},
 				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/00_check libraries')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "beaf2b56-87cf-4e7a-b080-f83d14ea6815"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import pip #needed to use the pip functions\n",
+							"for i in pip.get_installed_distributions(local_only=True):print(i)"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
 			},
 			"dependsOn": []
 		},
@@ -19170,6 +19247,1004 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/0_historical esg reports')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "7b24a2e3-037c-42c2-ad3d-3e411481c101"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import requests"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Company"
+									],
+									"values": [
+										"Company"
+									],
+									"yLabel": "Company",
+									"xLabel": "Company",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Company\":{\"aberdeen standard\":1,\"abri capital\":1,\"apollo\":1,\"bank of america\":1,\"barclays\":1,\"bluebay\":1,\"bmogan\":1,\"cerberus\":1,\"cinven\":1,\"citi\":1,\"coller capital\":1,\"credit suisse\":1,\"exponent\":1,\"goldman sachs\":1,\"hermes investments\":1,\"hsbc\":1,\"jp morgan chase\":1,\"kkr\":1,\"lasalle\":1,\"lazard\":1,\"lloyds\":1,\"macquarie\":1,\"morgan stanley\":1,\"northern trust\":1,\"rbc\":1,\"riverstone\":1,\"ruffer\":1,\"santander\":1,\"schroders\":1,\"silverfleet capital\":1,\"standard chartered\":1,\"td bank\":1,\"vanguard\":1,\"warburg pircus\":1}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Esg/Esg.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"EsgData = nqSdf.toPandas()\n",
+							"display(EsgData)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import (\n",
+							"    BlockBlobService\n",
+							")\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"\n",
+							"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from urllib.parse import urlparse\n",
+							"from pathlib import Path\n",
+							"\n",
+							"for index, esg in EsgData.iterrows():\n",
+							"    url = esg['Url']\n",
+							"    r = requests.get(url, allow_redirects=True)\n",
+							"    a = urlparse(url)\n",
+							"    blobName = 'EsgReports/' + Path(a.path).name\n",
+							"    blobService.create_blob_from_text(containerName, blobName, r.content)\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_historical news and sentiment')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "3dcad88a-95de-47b6-a4b7-940f3f6695bb"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+							"from azure.storage.blob import BlobClient\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import urllib.parse, base64\n",
+							"import json\n",
+							"import requests\n",
+							"import pandas as pd\n",
+							"import datetime\n",
+							"import pytz\n",
+							"from azure.core.credentials import AzureKeyCredential\n",
+							"from azure.ai.textanalytics import TextAnalyticsClient\n",
+							"\n",
+							"search_url = \"https://southcentralus.api.cognitive.microsoft.com/bing/v7.0/news/search\"\n",
+							"#sentiment_url = 'https://southcentralus.api.cognitive.microsoft.com/text/analytics/v3.0/sentiment' # service address \n",
+							"sentiment_url = 'https://southcentralus.api.cognitive.microsoft.com'\n",
+							"api_key = 'c62e1aa4119b4803a86a93f3a6062d42'          # Azure Cognitive API Key, replace with your own key\n",
+							"\n",
+							"\n",
+							"credential = AzureKeyCredential(api_key)\n",
+							"text_analytics_client = TextAnalyticsClient(endpoint=sentiment_url, credential=credential)"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"#for row in nqDf.rdd.collect():\n",
+							"for index, ticker in portfolioData.iterrows():\n",
+							"\n",
+							"    dfObj = pd.DataFrame(columns=['Symbol', 'Name', 'Url', 'Date_Published', 'Description', 'Sentiment', 'Positive_Score', 'Negative_Score', 'Neutral_Score'])\n",
+							"\n",
+							"    headers = {'Ocp-Apim-Subscription-Key':api_key, \\\n",
+							"                'Content-type': 'application/json',\\\n",
+							"                'Accept': 'application/json'}\n",
+							"\n",
+							"    symbol = ticker['Ticker']\n",
+							"\n",
+							"    params = urllib.parse.urlencode({\n",
+							"        # Request parameters\n",
+							"        'q': ticker['Ticker'],\n",
+							"        'offset': '0',\n",
+							"        'mkt': 'en-us',\n",
+							"        'freshness': 'Month',\n",
+							"        'count' : 100\n",
+							"    })\n",
+							"\n",
+							"    response = requests.get(search_url, headers=headers, params=params)\n",
+							"    response.raise_for_status()\n",
+							"    search_results = response.json()\n",
+							"    #print(json.dumps(search_results['value'], indent=2, sort_keys=True))\n",
+							"    for value in search_results['value']:\n",
+							"        description = value['description']\n",
+							"        url = value['url']\n",
+							"        name = value['name']\n",
+							"        publishedDate = value['datePublished']\n",
+							"    \n",
+							"        documents = [\"'\" + description + \"'\"]\n",
+							"\n",
+							"        response = text_analytics_client.analyze_sentiment(documents, language=\"en\")\n",
+							"        result = [doc for doc in response if not doc.is_error]\n",
+							"        #print(result)\n",
+							"\n",
+							"        for doc in result:\n",
+							"            #print(\"Overall sentiment: {}\".format(doc.sentiment))\n",
+							"            #print(\"Scores: positive={}; neutral={}; negative={} \\n\".format(\n",
+							"            #    doc.confidence_scores.positive,\n",
+							"            #    doc.confidence_scores.neutral,\n",
+							"            #    doc.confidence_scores.negative,\n",
+							"            #))\n",
+							"            dfObj = dfObj.append({'Symbol': symbol, 'Name': name, 'Url': url, 'Date_Published': publishedDate, 'Description' : description, 'Sentiment': doc.sentiment, 'Positive_Score':doc.confidence_scores.positive, 'Negative_Score': doc.confidence_scores.negative, 'Neutral_Score': doc.confidence_scores.neutral}, ignore_index=True)\n",
+							"    \n",
+							"    currDate = datetime.datetime.now(pytz.timezone('US/Central'))\n",
+							"    output = dfObj.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+							"    blobName = \"News/HistoricalData/\" + ticker['Ticker'] + \".csv\"\n",
+							"    blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+							"    blob.upload_blob(output)"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_historical sec 10k reports')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "fca4b6dd-b1bd-45ee-8d5c-66ecb32428e4"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"# Importing built-in libraries (no need to install these)\n",
+							"import re\n",
+							"import os\n",
+							"from time import gmtime, strftime\n",
+							"from datetime import datetime, timedelta\n",
+							"import unicodedata\n",
+							"\n",
+							"# Importing libraries you need to install\n",
+							"import pandas as pd\n",
+							"import numpy as np\n",
+							"from sklearn.metrics.pairwise import cosine_similarity\n",
+							"import requests\n",
+							"import bs4 as bs\n",
+							"from lxml import html\n",
+							"from tqdm import tqdm\n",
+							"\n",
+							"from ratelimit import limits, sleep_and_retry\n",
+							"from bs4 import BeautifulSoup\n",
+							"\n",
+							"import pprint"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Common methods to define SEC API endpoint and Getting SEC Data based on the document type and CIK\n",
+							"class SecAPI(object):\n",
+							"    SecCallLimit = {'calls': 10, 'seconds': 1}\n",
+							"\n",
+							"    @staticmethod\n",
+							"    @sleep_and_retry\n",
+							"    # Dividing the call limit by half to avoid coming close to the limit\n",
+							"    @limits(calls=SecCallLimit['calls'] / 2, period=SecCallLimit['seconds'])\n",
+							"    def _call_sec(url):\n",
+							"        return requests.get(url)\n",
+							"\n",
+							"    def get(self, url):\n",
+							"        return self._call_sec(url).text\n",
+							"    \n",
+							"def GetSecData(cik, ticker, doc_type, start=0, count=60):\n",
+							"    rss_url = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany' \\\n",
+							"        '&CIK={}&type={}&start={}&count={}&owner=exclude&output=atom' \\\n",
+							"        .format(cik, doc_type, start, count)\n",
+							"    sec_data = sec_api.get(rss_url)\n",
+							"    feed = BeautifulSoup(sec_data.encode('ascii'), 'xml').feed\n",
+							"    entries = [\n",
+							"        (\n",
+							"            entry.content.find('filing-href').getText(),\n",
+							"            entry.content.find('filing-type').getText(),\n",
+							"            entry.content.find('filing-date').getText(),\n",
+							"            cik,\n",
+							"            ticker)\n",
+							"        for entry in feed.find_all('entry', recursive=False)]\n",
+							"\n",
+							"    return entries"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"sec_api = SecAPI()"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Get the URL and list of all reports for 10K \n",
+							"sec_data = {}\n",
+							"\n",
+							"for index, ticker in portfolioData.iterrows():\n",
+							"    sec_data[ticker['Ticker']] = GetSecData(ticker['CIK'], ticker['Ticker'], '10-K')\n",
+							"    "
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Define the path to save 10K and 10Q\n",
+							"path10K = 'SecReports/10K/'"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import (\n",
+							"    BlockBlobService\n",
+							")\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"\n",
+							"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)"
+						],
+						"outputs": [],
+						"execution_count": 10
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Download all 10K Reports\n",
+							"import time\n",
+							"for ticker, data in sec_data.items():\n",
+							"    #raw_fillings_by_ticker[ticker] = {}\n",
+							"    for index_url, file_type, file_date, cik, tckr in tqdm(data, desc='Downloading {} Fillings'.format(ticker), unit='filling'):\n",
+							"        if (file_type == '10-K'):\n",
+							"            file_url = index_url.replace('-index.htm', '.txt').replace('.txtl', '.txt')       \n",
+							"            secData = sec_api.get(file_url)\n",
+							"            blobName = path10K + tckr + '/' + cik + '_' + file_date + '.txt'\n",
+							"            blobService.create_blob_from_text(containerName, blobName, secData)\n",
+							"            time.sleep(5)\n",
+							"            "
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Get the URL and list of all reports for 10Q\n",
+							"sec_data = {}\n",
+							"\n",
+							"for index, ticker in tickerDataTop10.iterrows():\n",
+							"    sec_data[ticker['Nasdaq_Symbol']] = GetSecData(ticker['CIK'], ticker['Nasdaq_Symbol'], '10-Q')\n",
+							"    "
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Download all 10Q Reports\n",
+							"for ticker, data in sec_data.items():\n",
+							"    #raw_fillings_by_ticker[ticker] = {}\n",
+							"    for index_url, file_type, file_date, cik, tckr in tqdm(data, desc='Downloading {} Fillings'.format(ticker), unit='filling'):\n",
+							"        if (file_type == '10-Q'):\n",
+							"            file_url = index_url.replace('-index.htm', '.txt').replace('.txtl', '.txt')       \n",
+							"            #raw_fillings_by_ticker[ticker][file_date] = sec_api.get(file_url)\n",
+							"            secData = sec_api.get(file_url)\n",
+							"            blobName = path10Q + tckr + '/' + cik + '_' + file_date + '.txt'\n",
+							"            blobService.create_blob_from_text(containerName, blobName, secData)\n",
+							"            #os.makedirs(os.path.dirname(blobName), exist_ok=True)\n",
+							"            #html_file = open(fileName, 'w+')\n",
+							"            #html_file.write(secData)\n",
+							"            #html_file.close()\n",
+							"            "
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_historical sec 10q reports')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "199d8cb2-e790-4fb8-8171-f8e718771152"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"# Importing built-in libraries (no need to install these)\n",
+							"import re\n",
+							"import os\n",
+							"from time import gmtime, strftime\n",
+							"from datetime import datetime, timedelta\n",
+							"import unicodedata\n",
+							"\n",
+							"# Importing libraries you need to install\n",
+							"import pandas as pd\n",
+							"import numpy as np\n",
+							"from sklearn.metrics.pairwise import cosine_similarity\n",
+							"import requestst\n",
+							"import bs4 as bs\n",
+							"from lxml import html\n",
+							"from tqdm import tqdm\n",
+							"\n",
+							"from ratelimit import limits, sleep_and_retry\n",
+							"from bs4 import BeautifulSoup\n",
+							"\n",
+							"import pprint"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Common methods to define SEC API endpoint and Getting SEC Data based on the document type and CIK\n",
+							"class SecAPI(object):\n",
+							"    SecCallLimit = {'calls': 10, 'seconds': 1}\n",
+							"\n",
+							"    @staticmethod\n",
+							"    @sleep_and_retry\n",
+							"    # Dividing the call limit by half to avoid coming close to the limit\n",
+							"    @limits(calls=SecCallLimit['calls'] / 2, period=SecCallLimit['seconds'])\n",
+							"    def _call_sec(url):\n",
+							"        return requests.get(url)\n",
+							"\n",
+							"    def get(self, url):\n",
+							"        return self._call_sec(url).text\n",
+							"    \n",
+							"def GetSecData(cik, ticker, doc_type, start=0, count=60):\n",
+							"    rss_url = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany' \\\n",
+							"        '&CIK={}&type={}&start={}&count={}&owner=exclude&output=atom' \\\n",
+							"        .format(cik, doc_type, start, count)\n",
+							"    sec_data = sec_api.get(rss_url)\n",
+							"    feed = BeautifulSoup(sec_data.encode('ascii'), 'xml').feed\n",
+							"    entries = [\n",
+							"        (\n",
+							"            entry.content.find('filing-href').getText(),\n",
+							"            entry.content.find('filing-type').getText(),\n",
+							"            entry.content.find('filing-date').getText(),\n",
+							"            cik,\n",
+							"            ticker)\n",
+							"        for entry in feed.find_all('entry', recursive=False)]\n",
+							"\n",
+							"    return entries"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"sec_api = SecAPI()"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Get the URL and list of all reports for 10Q \n",
+							"sec_data = {}\n",
+							"\n",
+							"for index, ticker in portfolioData.iterrows():\n",
+							"    sec_data[ticker['Ticker']] = GetSecData(ticker['CIK'], ticker['Ticker'], '10-Q')\n",
+							"    "
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Define the path to save 10K and 10Q\n",
+							"path10Q = 'SecReports/10Q/'"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import (\n",
+							"    BlockBlobService\n",
+							")\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"\n",
+							"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Download all 10Q Reports\n",
+							"import time\n",
+							"\n",
+							"for ticker, data in sec_data.items():\n",
+							"    #raw_fillings_by_ticker[ticker] = {}\n",
+							"    for index_url, file_type, file_date, cik, tckr in tqdm(data, desc='Downloading {} Fillings'.format(ticker), unit='filling'):\n",
+							"        if (file_type == '10-Q'):\n",
+							"            file_url = index_url.replace('-index.htm', '.txt').replace('.txtl', '.txt')       \n",
+							"            secData = sec_api.get(file_url)\n",
+							"            blobName = path10Q + tckr + '/' + cik + '_' + file_date + '.txt'\n",
+							"            blobService.create_blob_from_text(containerName, blobName, secData)\n",
+							"            time.sleep(2)"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_historical stock prices')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "ded25954-a11a-49d1-86dc-fbe25e3cfdbb"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"#Import the required libraries\n",
+							"import pandas as pd\n",
+							"import yfinance as yf\n",
+							"#from yahoofinancials import YahooFinancials\n",
+							"from datetime import datetime"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+							"from azure.storage.blob import BlobClient\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Get the stock price for all tickers and write it to CSV file\n",
+							"#yahoo_financials = YahooFinancials(tickerTop10)\n",
+							"\n",
+							"#data = yahoo_financials.get_historical_price_data(start_date='2019-01-01', \n",
+							"#                                                  end_date='2019-01-31', \n",
+							"#                                                  time_interval='daily')\n",
+							"finalColNames = [\"Portfolio\", \"Sector\", \"Cik\", \"Date\", \"Ticker\", \"AdjClose\"]\n",
+							"\n",
+							"for index, ticker in portfolioData.iterrows():\n",
+							"    finalDf = pd.DataFrame(columns = finalColNames)\n",
+							"    stockData = yf.download(ticker['Ticker'], period=\"max\", interval='1d', group_by='ticker', threads=True, progress=True)\n",
+							"    for index, row in stockData.iterrows():\n",
+							"        finalDf = finalDf.append({'Portfolio' : str(ticker['Portfolio']), 'Sector' : ticker['Sector'], 'Cik' : ticker['CIK'], 'Date' : index.date() , 'Ticker' : ticker['Ticker'], 'AdjClose' : row['Adj Close'] } , ignore_index=True)\n",
+							"    output = finalDf.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+							"    blobName = \"PortfolioQuotes/HistoricalData/\" + ticker['Ticker'] + \".csv\"\n",
+							"    blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+							"    blob.upload_blob(output)\n",
+							"    #blobService.create_blob_from_text(containerName, blobName, output)\n",
+							"\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/0_model training')]",
 			"type": "Microsoft.Synapse/workspaces/notebooks",
 			"apiVersion": "2019-06-01-preview",
@@ -19506,6 +20581,180 @@
 							""
 						],
 						"outputs": []
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_portfolio cik')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "6a62321b-2406-4ab6-8f0e-8f9060fbe3a3"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"# Required packages\n",
+							"import re\n",
+							"import requests\n",
+							"import pandas as pd"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"#Define the secURL and the regex to be used\n",
+							"secUrl = 'http://www.sec.gov/cgi-bin/browse-edgar?CIK={}&Find=Search&owner=exclude&action=getcompany'\n",
+							"cikRegEx = re.compile(r'.CIK=(\\d{10}).')"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Load our data into Dataframe\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/Portfolio.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"nqPdf = nqSdf.toPandas()"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"display(nqPdf)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from time import sleep\n",
+							"from azure.storage.blob import (\n",
+							"    BlockBlobService\n",
+							")\n",
+							"\n",
+							"# Create empty data frame\n",
+							"finalColNames = [\"Portfolio\", \"Sector\", \"Ticker\", \"CreatedDate\", \"CIK\"]\n",
+							"finalDf = pd.DataFrame(columns = finalColNames)\n",
+							"\n",
+							"# Iterate through all ticker data to find out the CIK from sec website\n",
+							"for index, ticker in nqPdf.iterrows():\n",
+							"    sleep(2)\n",
+							"    f = requests.get(secUrl.format(ticker['Ticker']), stream=True);\n",
+							"    results = cikRegEx.findall(f.text)\n",
+							"    if len(results):\n",
+							"        finalDf = finalDf.append({'Portfolio' : str(ticker['Portfolio']) , 'Sector' : ticker['Sector'], 'Ticker' : ticker['Ticker'], 'CreatedDate' : ticker['CreatedDate'], 'CIK' : str(results[0]) } , ignore_index=True)\n",
+							"\n",
+							"# Write CSV file \n",
+							"# storage_path = 'abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv'\n",
+							"# sDf = spark.createDataFrame(finalDf)\n",
+							"# sDf.coalesce(1).write.mode(\"overwrite\").csv(storage_path, header=\"true\")\n",
+							"output = finalDf.to_csv(index=False, encoding = \"utf-8\")\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"blobName = \"Portfolio/PortfolioCik.csv\"\n",
+							"\n",
+							"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)\n",
+							"\n",
+							"# Delete existing blob\n",
+							"blobService.delete_blob(containerName,blobName,snapshot=None)\n",
+							"\n",
+							"blobService.create_blob_from_text(containerName, blobName, output)\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -19973,6 +21222,376 @@
 							""
 						],
 						"outputs": []
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_daily stock price')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "f2110779-c8f7-4a2d-a74e-b1ffda1cfd83"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"#Import the required libraries\n",
+							"import pandas as pd\n",
+							"import yfinance as yf\n",
+							"#from yahoofinancials import YahooFinancials\n",
+							"from datetime import datetime"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+							"from azure.storage.blob import BlobClient\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Get the stock price for all tickers and write it to CSV file\n",
+							"#yahoo_financials = YahooFinancials(tickerTop10)\n",
+							"\n",
+							"#data = yahoo_financials.get_historical_price_data(start_date='2019-01-01', \n",
+							"#                                                  end_date='2019-01-31', \n",
+							"#                                                  time_interval='daily')\n",
+							"import datetime\n",
+							"\n",
+							"finalColNames = [\"Portfolio\", \"Sector\", \"Cik\", \"Date\", \"Ticker\", \"AdjClose\"]\n",
+							"\n",
+							"for index, ticker in portfolioData.iterrows():\n",
+							"    finalDf = pd.DataFrame(columns = finalColNames)\n",
+							"    #stockData = yf.download(ticker['Ticker'], start='1994-01-01', end='2020-03-31', time_interval='daily', progress=True)\n",
+							"    #stockData = yf.download(ticker['Ticker'], start='2020-10-20', end='2020-10-21', time_interval='daily', progress=True)\n",
+							"    stockData = yf.Ticker(ticker['Ticker']).history(period=\"1d\", interval=\"1d\").tail(1)\n",
+							"    totalRows = len(stockData.index)\n",
+							"    if (totalRows > 0):\n",
+							"        for index, row in stockData.iterrows():\n",
+							"            finalDf = finalDf.append({'Portfolio' : str(ticker['Portfolio']), 'Sector' : ticker['Sector'], 'Cik' : ticker['CIK'], 'Date' : index.date() , 'Ticker' : ticker['Ticker'], 'AdjClose' : row['Close'] } , ignore_index=True)\n",
+							"            date = datetime.datetime.strptime(str(index.date()), \"%Y-%m-%d\")\n",
+							"        output = finalDf.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+							"        blobName = \"PortfolioQuotes/DailyData/\" + str(date.year) + \"/\" + str(date.month) + \"/\" + str(date.day) + \"/\" + ticker['Ticker'] + \".csv\"\n",
+							"        blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+							"        blob.upload_blob(output)\n",
+							"\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 37
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/1_news and sentiment')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "5658fd15-c332-4ad0-86aa-6aaf445cfe20"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+							"from azure.storage.blob import BlobClient\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"import urllib.parse, base64\n",
+							"import json\n",
+							"import requests\n",
+							"import pandas as pd\n",
+							"import datetime\n",
+							"import pytz\n",
+							"from azure.core.credentials import AzureKeyCredential\n",
+							"from azure.ai.textanalytics import TextAnalyticsClient\n",
+							"\n",
+							"search_url = \"https://southcentralus.api.cognitive.microsoft.com/bing/v7.0/news/search\"\n",
+							"#sentiment_url = 'https://southcentralus.api.cognitive.microsoft.com/text/analytics/v3.0/sentiment' # service address \n",
+							"sentiment_url = 'https://southcentralus.api.cognitive.microsoft.com'\n",
+							"api_key = 'c62e1aa4119b4803a86a93f3a6062d42'          # Azure Cognitive API Key, replace with your own key\n",
+							"\n",
+							"\n",
+							"credential = AzureKeyCredential(api_key)\n",
+							"text_analytics_client = TextAnalyticsClient(endpoint=sentiment_url, credential=credential)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"#for row in nqDf.rdd.collect():\n",
+							"for index, ticker in portfolioData.iterrows():\n",
+							"\n",
+							"    dfObj = pd.DataFrame(columns=['Symbol', 'Name', 'Url', 'Date_Published', 'Description', 'Sentiment', 'Positive_Score', 'Negative_Score', 'Neutral_Score'])\n",
+							"\n",
+							"    headers = {'Ocp-Apim-Subscription-Key':api_key, \\\n",
+							"                'Content-type': 'application/json',\\\n",
+							"                'Accept': 'application/json'}\n",
+							"\n",
+							"    symbol = ticker['Ticker']\n",
+							"\n",
+							"    params = urllib.parse.urlencode({\n",
+							"        # Request parameters\n",
+							"        'q': ticker['Ticker'],\n",
+							"        'offset': '0',\n",
+							"        'mkt': 'en-us',\n",
+							"        'freshness': 'Day',\n",
+							"        'count' : 100\n",
+							"    })\n",
+							"\n",
+							"    response = requests.get(search_url, headers=headers, params=params)\n",
+							"    response.raise_for_status()\n",
+							"    search_results = response.json()\n",
+							"    #print(json.dumps(search_results['value'], indent=2, sort_keys=True))\n",
+							"    for value in search_results['value']:\n",
+							"        description = value['description']\n",
+							"        url = value['url']\n",
+							"        name = value['name']\n",
+							"        publishedDate = value['datePublished']\n",
+							"    \n",
+							"        documents = [\"'\" + description + \"'\"]\n",
+							"\n",
+							"        response = text_analytics_client.analyze_sentiment(documents, language=\"en\")\n",
+							"        result = [doc for doc in response if not doc.is_error]\n",
+							"        #print(result)\n",
+							"\n",
+							"        for doc in result:\n",
+							"            #print(\"Overall sentiment: {}\".format(doc.sentiment))\n",
+							"            #print(\"Scores: positive={}; neutral={}; negative={} \\n\".format(\n",
+							"            #    doc.confidence_scores.positive,\n",
+							"            #    doc.confidence_scores.neutral,\n",
+							"            #    doc.confidence_scores.negative,\n",
+							"            #))\n",
+							"            dfObj = dfObj.append({'Symbol': symbol, 'Name': name, 'Url': url, 'Date_Published': publishedDate, 'Description' : description, 'Sentiment': doc.sentiment, 'Positive_Score':doc.confidence_scores.positive, 'Negative_Score': doc.confidence_scores.negative, 'Neutral_Score': doc.confidence_scores.neutral}, ignore_index=True)\n",
+							"    \n",
+							"    currDate = datetime.datetime.now(pytz.timezone('US/Central'))\n",
+							"    output = dfObj.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+							"    blobName = \"News/DailyData/\" + str(currDate.year) + \"/\" + str(currDate.month) + \"/\" + str(currDate.day) + \"/\" + ticker['Ticker'] + \".csv\"\n",
+							"    blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+							"    blob.upload_blob(output)"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -24255,6 +25874,2026 @@
 							""
 						],
 						"outputs": []
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_gdelt based esg')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "ee3fb5ff-a33c-45b3-b6e2-cc534fd7029a"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_spark",
+						"display_name": "scala"
+					},
+					"language_info": {
+						"name": "scala"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"//\r\n",
+							"// Original Demo code used from \r\n",
+							"//  https://databricks.com/blog/2020/07/10/a-data-driven-approach-to-environmental-social-and-governance.html\r\n",
+							"//\r\n",
+							"// modified for simple ESG calculation and converted to Synapse notebook by Mark Leischner 2021-02-10\r\n",
+							"//\r\n",
+							"// NOTE: the databricks concept of rwa,silver,gold is used here.  Could be modified for more efficient file handling\r\n",
+							"//\r\n",
+							"// Demo uses Jan 2021 files already downloaded GDELT files\r\n",
+							"//     production version could download the updated files from GDELT project which are updated every 15 minutes\r\n",
+							"//\r\n",
+							"//  From GDELT data defintion\r\n",
+							"//     Tone.  This is the average “tone” of all documents containing one or more mentions of thisnameset.    \r\n",
+							"//            The  score  ranges  from -100  (extremely  negative)  to  +100  (extremely positive).  \r\n",
+							"//            Common values range between -10 and +10, with 0 indicating neutral.  This is calculated  as \r\n",
+							"//            Positive  Score  minus  Negative  Score.    Note  that  both  Positive  Score  and Negative  Score \r\n",
+							"//            are available  separately  below  as  well.    A  document  with  a  Tone  score close to zero may either\r\n",
+							"//            have low emotional response or may have a Positive Score and Negative  Score  that  are  roughly  equivalent  \r\n",
+							"//            to  each  other,  such  that  they  nullify  each other.    These  situations  can  be  detected  either  through\r\n",
+							"//            looking  directly  at the Positive Score and Negative Scorevariablesor through the Polarity variable.\r\n",
+							"//\r\n",
+							"// Further Notes:\r\n",
+							"// The ESG score created in this demo code employs a simple average calculation over the GDELT input data csv files.\r\n",
+							"//   The GDELT files take news articles and creates a theme for each article and a tone for the article.  \r\n",
+							"//   Usual tone scores range is from -10 to 10, with 0 being neutral, above 0 a positive, and below 0 a negative.\r\n",
+							"//   The final result score file contains Ticker, ESGType, ESGScore.  Each ticker can have up to three scores, \r\n",
+							"//   one for E - Economy, S - Social, and G - Corporate Governance.   \r\n",
+							"//\r\n",
+							"// Future development options are to split up the information into more specifc category buckets and \r\n",
+							"//   give weights to each bucket.  With these numbers and weights, you could generate an overall ESG score per company.\r\n",
+							"//\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"import org.apache.spark.sql.types._\r\n",
+							"import org.apache.spark.sql.functions._\r\n",
+							"\r\n",
+							"val schemadf1 = (new StructType()).add(\"globalEventID\",StringType,true).add(\"pDate\",StringType).add(\"_c02\",StringType).add(\"_c03\",StringType).add(\"documentIdentifier\",StringType).add(\"_c05\",StringType).add(\"_c06\",StringType).add(\"themesStr\",StringType).add(\"_c08\",StringType).add(\"_c09\",StringType).add(\"_c10\",StringType).add(\"_c11\",StringType).add(\"_c12\",StringType).add(\"organisationsStr\",StringType).add(\"_c14\",StringType).add(\"tones\",StringType).add(\"_c16\",StringType).add(\"_c17\",StringType).add(\"_c18\",StringType).add(\"_c19\",StringType).add(\"_c20\",StringType).add(\"_c21\",StringType).add(\"_c22\",StringType).add(\"_c23\",StringType).add(\"_c24\",StringType).add(\"_c25\",StringType).add(\"_c26\",StringType)\r\n",
+							"\r\n",
+							"val df1 = spark.read.format(\"csv\").options(Map(\"delimiter\"->\"\\t\")).schema(schemadf1).load(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/2021/01/*.csv\")\r\n",
+							"\r\n",
+							"val gdf1 = df1.select(\r\n",
+							"  col(\"globalEventID\"), \r\n",
+							"  (substring(col(\"pDate\"), 0, 8)).as(\"publishDate\"),\r\n",
+							"  col(\"_c02\"), col(\"_c03\"),\r\n",
+							"  col(\"documentIdentifier\"),\r\n",
+							"  col(\"_c05\"), col(\"_c06\"),\r\n",
+							"  split(col(\"themesStr\"),\";\").as(\"themesStr\").as(\"themes\"),\r\n",
+							"  col(\"_c08\"), col(\"_c09\"), col(\"_c10\"), col(\"_c11\"), col(\"_c12\"),\r\n",
+							"  split(col(\"organisationsStr\"),\";\").as(\"organisations\"),\r\n",
+							"  col(\"_c14\"),\r\n",
+							"  substring_index(col(\"tones\"), \",\", 1).as(\"tone\"),\r\n",
+							"  col(\"_c16\"), col(\"_c17\"), col(\"_c18\"), col(\"_c19\"), col(\"_c20\"), col(\"_c21\"), col(\"_c22\"), col(\"_c23\"), col(\"_c24\"), col(\"_c25\"), col(\"_c26\"))\r\n",
+							"\r\n",
+							"//gdf1.show()\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"val gdf2 = df1.select(\r\n",
+							"  col(\"globalEventID\"), \r\n",
+							"  (substring(col(\"pDate\"), 0, 8)).as(\"publishDate\"),\r\n",
+							"  col(\"documentIdentifier\"),\r\n",
+							"  col(\"themesStr\"),\r\n",
+							"  col(\"organisationsStr\"),\r\n",
+							"  substring_index(col(\"tones\"), \",\", 1).as(\"tone\")\r\n",
+							"  )\r\n",
+							"\r\n",
+							"val gdfECON = gdf2.withColumn(\"containsECON\", col(\"themesStr\").rlike(\"ECON_\"))\r\n",
+							"val gdfENV = gdfECON.withColumn(\"containsENV\", col(\"themesStr\").rlike(\"ENV_\"))\r\n",
+							"val gdfUNGP = gdfENV.withColumn(\"containsUNGP\", col(\"themesStr\").rlike(\"UNGP_\"))\r\n",
+							"\r\n",
+							"//gdfUNGP.show()\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"gdfUNGP.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt.csv\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"val gdelt_silver_df = (gdfUNGP.select(\r\n",
+							"  col(\"globalEventID\"), \r\n",
+							"  col(\"publishDate\"),\r\n",
+							"  col(\"documentIdentifier\").as(\"url\"),\r\n",
+							"  expr(\"case when containsECON then 'ECON' when containsENV then 'ENV' when containsUNGP then 'UNGP' else 'OTHER' end\").as(\"theme\"),\r\n",
+							"  col(\"organisationsStr\").as(\"organisations\"),\r\n",
+							"  col(\"tone\")\r\n",
+							"  )).filter(\"theme not like 'OTHER'\")\r\n",
+							"\r\n",
+							"//gdelt_silver_df.show()\r\n",
+							"\r\n",
+							"gdelt_silver_df.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_silver.csv\")\r\n",
+							"\r\n",
+							"gdelt_silver_df.createOrReplaceTempView(\"gdelt_silver\");\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"import org.apache.spark.sql.types._\r\n",
+							"import org.apache.spark.sql.functions._\r\n",
+							"\r\n",
+							"val schemaport = (new StructType()).add(\"Ticker\",StringType).add(\"TickerName\",StringType)\r\n",
+							"\r\n",
+							"val portfoliodf = spark.read.format(\"csv\").options(Map(\"delimiter\"->\",\")).schema(schemaport).load(\"abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioName.csv\")\r\n",
+							"\r\n",
+							"//portfoliodf.show()\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"val tlist = portfoliodf.select(\"TickerName\").map(r => r.getString(0)).collect().toList\r\n",
+							"\r\n",
+							"for (tname <- tlist) {\r\n",
+							"\r\n",
+							"     val tempdf = gdelt_silver_df.select( \r\n",
+							"     col(\"globalEventID\"), \r\n",
+							"     col(\"publishDate\"),\r\n",
+							"     col(\"url\"),\r\n",
+							"     col(\"theme\"),\r\n",
+							"     lit(tname.toLowerCase()).as(\"organisation\"),\r\n",
+							"     col(\"tone\")\r\n",
+							"     ).filter(\"organisations like '%\" + tname.toLowerCase() + \"%'\")\r\n",
+							"\r\n",
+							"    tempdf.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/myportfolio/\" + tname + \"/gdelt_gold.csv\")\r\n",
+							"\r\n",
+							"   }"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "python"
+							},
+							"collapsed": true
+						},
+						"source": [
+							"%%pyspark\r\n",
+							"from pyspark.sql import functions as F\r\n",
+							"from pyspark.sql import types \r\n",
+							"\r\n",
+							"esg_gold = spark.read.option(\"header\", \"true\").format(\"csv\").load(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/myportfolio/*/gdelt_gold.csv/*.csv\").groupBy(\"organisation\",\"theme\").agg( F.sum(\"tone\").alias(\"tone\"), F.count(\"tone\").alias(\"total\") ).select(\"theme\", \"organisation\", \"tone\", \"total\").withColumn(\"avg\", F.col(\"tone\")/F.col(\"total\"))\r\n",
+							"\r\n",
+							"esg_gold.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_gold_avg.csv\")\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"val esg_scores = (spark.read.option(\"header\", \"true\").format(\"csv\").load(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_gold_avg.csv/*.csv\")).withcolumn(\"TickerName\", col(\"oragnisation\"))\r\n",
+							"\r\n",
+							"val esg_results = portfoliodf.join(esg_scores, \"TickerName\").withColumn(\"ESGType\", when(col(\"theme\") === \"ECON\", \"E\").when(col(\"theme\") === \"ENV\", \"S\").when(col(\"theme\") === \"UNGP\", \"G\")  ).withColumn(\"ESGScore\",col(\"avg\")).select(\"Ticker\", \"ESGType\", \"ESGScore\")\r\n",
+							"\r\n",
+							"esg_results.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_results.csv\")\r\n",
+							"\r\n",
+							"esg_results.show\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_stock forecast automl')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "0ee47912-4363-481a-a779-ea3f515982e6"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import azureml.core\n",
+							"import pandas as pd\n",
+							"import numpy as np\n",
+							"import logging\n",
+							"\n",
+							"from azureml.core.workspace import Workspace\n",
+							"from azureml.core.experiment import Experiment\n",
+							"from azureml.train.automl import AutoMLConfig\n",
+							"from azureml.automl.core.featurization import FeaturizationConfig\n",
+							"#print(\"SDK Version:\", azureml.core.VERSION)\n",
+							"\n",
+							"from azureml.data.datapath import DataPath\n",
+							"from azureml.core import Datastore\n",
+							"from azureml.core.dataset import Dataset\n",
+							"from azureml.train.automl import AutoMLConfig\n",
+							"from azureml.train.automl.run import AutoMLRun\n",
+							"import azureml.core\n",
+							"import logging\n",
+							"import numpy as np\n",
+							"import pandas as pd\n",
+							"from azureml.core.compute import AmlCompute\n",
+							"from azureml.core.compute import ComputeTarget\n",
+							"from pandas.tseries.offsets import *\n",
+							"from datetime import datetime, timedelta"
+						],
+						"outputs": [],
+						"execution_count": 84
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"subscription_id = \"9c1bf73d-cfe5-4113-bc28-5f637bb222ad\"\n",
+							"resource_group = \"marketrisk\"\n",
+							"workspace_name = \"marketriskaml\"\n",
+							"workspace_region = \"eastus\"\n",
+							"\n",
+							"ws = Workspace(workspace_name = workspace_name,\n",
+							"               subscription_id = subscription_id,\n",
+							"               resource_group = resource_group)\n",
+							"#ws.get_details()"
+						],
+						"outputs": [],
+						"execution_count": 85
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"## Create a new datastore\n",
+							"adlsDsName ='stockautoml'\n",
+							"adlsName = 'marketriskdl'\n",
+							"tenantId = '72f988bf-86f1-41af-91ab-2d7cd011db47'\n",
+							"clientId = '02c58df9-4f1d-444d-9077-1bf0769fcdfa'\n",
+							"clientSecret = '1IS7k9CZKC6MGAd_ll~.dL78yc-9x4wXTQ'\n",
+							"\n",
+							"try:\n",
+							"    adls_datastore = Datastore.get(ws, adlsDsName)\n",
+							"    print(\"Found Blob Datastore with name: %s\" % adls_datastore)\n",
+							"except HttpOperationError:\n",
+							"    adls_datastore = Datastore.register_azure_data_lake(workspace=ws, datastore_name=adlsDsName, subscription_id=subscription_id, resource_group=resource_group, store_name=adlsName, tenant_id=tenantId, client_id=clientId, client_secret=clientSecret)"
+						],
+						"outputs": [],
+						"execution_count": 86
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 87
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+							"from azure.storage.blob import BlobClient\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+						],
+						"outputs": [],
+						"execution_count": 88
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Choose a name for your cluster.\n",
+							"amlcompute_cluster_name = \"cpu-cluster\"\n",
+							"found = False\n",
+							"\n",
+							"# Check if this compute target already exists in the workspace.\n",
+							"cts = ws.compute_targets\n",
+							"if amlcompute_cluster_name in cts and cts[amlcompute_cluster_name].type == 'AmlCompute':\n",
+							"    found = True\n",
+							"    print('Found existing compute target.')\n",
+							"    compute_target = cts[amlcompute_cluster_name]\n",
+							"\n",
+							"if not found:\n",
+							"    print('Creating a new compute target...')\n",
+							"    provisioning_config = AmlCompute.provisioning_configuration(vm_size = \"STANDARD_D2_V2\", max_nodes = 10)\n",
+							"    # Create the cluster\n",
+							"    compute_target = ComputeTarget.create(ws, amlcompute_cluster_name, provisioning_config)\n",
+							"\n",
+							"# Can poll for a minimum number of nodes and for a specific timeout.\n",
+							"# If no min_node_count is provided, it will use the scale settings for the cluster.\n",
+							"compute_target.wait_for_completion(show_output = True, min_node_count = None, timeout_in_minutes = 20)"
+						],
+						"outputs": [],
+						"execution_count": 89
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Initial variables\n",
+							"time_column_name = 'Date'\n",
+							"#grain_column_names = ['Ticker']\n",
+							"target_column_name = 'AdjClose'\n",
+							"n_test_periods = 10\n",
+							"drop_column_names = ['Portfolio', 'Sector','Ticker', 'Cik']"
+						],
+						"outputs": [],
+						"execution_count": 90
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"def run_forecast(row):  \n",
+							"  \n",
+							"  portfolio = row.Portfolio\n",
+							"  sector = row.Sector\n",
+							"  ticker = row.Ticker\n",
+							"  filePath = '/PortfolioQuotes/HistoricalData/' + row.Ticker + '.csv'\n",
+							"  timevar='daily'\n",
+							"  datastore_path = [DataPath(adls_datastore, filePath)]\n",
+							"  tabular = Dataset.Tabular.from_delimited_files(path=datastore_path)\n",
+							" \n",
+							"  experiment_name = ticker + 'automl'\n",
+							"  experiment = Experiment(ws, experiment_name)\n",
+							"   \n",
+							"  automl_config = AutoMLConfig(task = 'forecasting',\n",
+							"                             debug_log = 'automl_errors.log',\n",
+							"                             primary_metric = 'normalized_root_mean_squared_error',\n",
+							"                             iteration_timeout_minutes = 5,\n",
+							"                             experiment_timeout_minutes = 15,\n",
+							"                             enable_early_stopping = True,\n",
+							"                             n_cross_validations = 3,\n",
+							"                             iterations = 2,\n",
+							"                             #compute_target=compute_target,\n",
+							"                             verbosity = logging.INFO,\n",
+							"                             training_data=tabular,\n",
+							"                             drop_column_names = drop_column_names,\n",
+							"                             label_column_name=target_column_name,\n",
+							"                             time_column_name = time_column_name,\n",
+							"                             max_horizon = n_test_periods,\n",
+							"                             #blocked_models = ['ElasticNet','GradirentBoosting','DecisionTree','KNN','LassoLars','SGD','RandomForest','ExtremeRandomTrees','LightGBM', 'AutoArima', 'XGBoostRegressor'])\n",
+							"                             allowed_models = ['XGBoostRegressor'])\n",
+							"\n",
+							"  local_run = experiment.submit(automl_config, show_output = True)\n",
+							"  best_run, fitted_model = local_run.get_output()\n",
+							"  print(fitted_model.steps)\n",
+							"\n",
+							"  model_name = best_run.properties['model_name']\n",
+							"  print(model_name)\n",
+							"\n",
+							"  start = tabular.take(1).to_pandas_dataframe().iloc[0]['Date']\n",
+							"  end = datetime.now()\n",
+							"  p = (end - start).days + 365\n",
+							"  p\n",
+							"\n",
+							"  forecast_pd = pd.DataFrame({'Date' : tabular.to_pandas_dataframe()['Date']})\n",
+							"\n",
+							"  #rng = pd.date_range(datetime.now(), periods=365, freq=BDay())\n",
+							"  rng = pd.date_range(datetime.now(), periods=365, freq='D')\n",
+							"  #rng = pd.date_range(end, periods=p, freq='D')\n",
+							"\n",
+							"  future_pd = pd.DataFrame({ 'Date': rng})\n",
+							"  future_pd['Date'] = future_pd['Date'].dt.date\n",
+							"\n",
+							"  #forecast_pd = pd.DataFrame({ 'Date': rng})\n",
+							"\n",
+							"  # future = m.make_future_dataframe(periods=365,freq = '1d')\n",
+							"  automl_prediction = fitted_model.predict(forecast_pd)\n",
+							"  #automl_prediction\n",
+							"  forecast_pd['yhat'] = automl_prediction.tolist()\n",
+							"\n",
+							"  automl_futureprediction = fitted_model.predict(future_pd)\n",
+							"  future_pd['yhat'] = automl_futureprediction.tolist()\n",
+							"\n",
+							"  df_train = tabular.to_pandas_dataframe(on_error='null', out_of_range_datetime='null')\n",
+							"  df_train = df_train[['Date','AdjClose']]\n",
+							"  df_train.columns = ['Date','actual']\n",
+							"  act_forecast = df_train.merge(forecast_pd[['Date','yhat']],on='Date',how='outer')\n",
+							"  act_forecast = act_forecast.append(future_pd[['Date','yhat']])\n",
+							"\n",
+							"  act_forecast['portfolio'] = portfolio\n",
+							"  act_forecast['sector'] = sector\n",
+							"  act_forecast['ticker'] = ticker\n",
+							"\n",
+							"  act_forecast['future_predicted'] = np.nan\n",
+							"  mask = (act_forecast['actual'].isnull())\n",
+							"  act_forecast['future_predicted'][mask] = act_forecast['yhat']\n",
+							"  act_forecast['yhat'][mask] = np.nan\n",
+							"\n",
+							"  act_forecast['timegran'] = timevar\n",
+							"  act_forecast['itemgran'] = 'store_item'\n",
+							"\n",
+							"  act_forecast.shape\n",
+							"  #print(act_forecast.head(4))\n",
+							"  act_forecast = act_forecast[['Date','portfolio','sector','ticker','actual','yhat','future_predicted','timegran','itemgran']]\n",
+							"  act_forecast.columns = ['Date','portfolio','sector','ticker','actual','predicted','future_predicted','timegran','itemgran']\n",
+							"  #act_forecast.columns = ['ds','store','item','sales','forecast','future_forecast','timegran','itemgran']\n",
+							"  return(act_forecast)"
+						],
+						"outputs": [],
+						"execution_count": 91
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"portfolioList = portfolioData.Ticker.tolist()\r\n",
+							"portfolioList"
+						],
+						"outputs": [],
+						"execution_count": 92
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"def run_forecast1(df1):\r\n",
+							"    display(df1)\r\n",
+							"    return df1"
+						],
+						"outputs": [],
+						"execution_count": 94
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"import pandas as pd\r\n",
+							"from joblib import Parallel, delayed\r\n",
+							"import multiprocessing\r\n",
+							"\r\n",
+							"def applyParallel(dfGrouped, func):\r\n",
+							"    retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfGrouped)\r\n",
+							"    return pd.concat(retLst)"
+						],
+						"outputs": [],
+						"execution_count": 97
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"result_columns = [\"Date\",\"portfolio\",\"sector\",\"ticker\",\"actual\",\"predicted\",\"future_predicted\",\"timegran\",\"itemgran\"]\r\n",
+							"alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']\r\n",
+							"df_result = pd.DataFrame(columns = result_columns)\r\n",
+							"\r\n",
+							"for i in alphaList:\r\n",
+							"  print(\"Processing data starting with \", i)\r\n",
+							"  f_result = pd.DataFrame(columns = result_columns)\r\n",
+							"  quotesFilterSdf = portfolioData[portfolioData['Ticker'].str.startswith(i)]#.sort_values('Ticker')\r\n",
+							"  applyParallel(quotesFilterSdf.groupby(quotesFilterSdf.Ticker), run_forecast1)\r\n",
+							"  #df_result = df_result.append(df_res)\r\n",
+							"  #print(df_result)\r\n",
+							"  #output = df_result.to_csv (index=False, header=True, encoding = \"utf-8\")\r\n",
+							"  #blobName = \"PortfolioQuotes/PortfolioForecast/\" + row.Ticker + \".csv\"\r\n",
+							"  #blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\r\n",
+							"  #blob.upload_blob(output)"
+						],
+						"outputs": [],
+						"execution_count": 98
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							"result_columns = [\"Date\",\"portfolio\",\"sector\",\"ticker\",\"actual\",\"predicted\",\"future_predicted\",\"timegran\",\"itemgran\"]\r\n",
+							"alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']\r\n",
+							"df_result = pd.DataFrame(columns = result_columns)\r\n",
+							"\r\n",
+							"for i in alphaList:\r\n",
+							"  print(\"Processing data starting with \", i)\r\n",
+							"  f_result = pd.DataFrame(columns = result_columns)\r\n",
+							"  quotesFilterSdf = portfolioData[portfolioData['Ticker'].str.startswith(i)]#.sort_values('Ticker')\r\n",
+							"  quotesFilterSdf.apply(run_forecast1)\r\n",
+							"  #df_result = df_result.append(df_res)\r\n",
+							"  #print(df_result)\r\n",
+							"  #output = df_result.to_csv (index=False, header=True, encoding = \"utf-8\")\r\n",
+							"  #blobName = \"PortfolioQuotes/PortfolioForecast/\" + row.Ticker + \".csv\"\r\n",
+							"  #blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\r\n",
+							"  #blob.upload_blob(output)"
+						],
+						"outputs": [],
+						"execution_count": 60
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"result_columns = [\"Date\",\"portfolio\",\"sector\",\"ticker\",\"actual\",\"predicted\",\"future_predicted\",\"timegran\",\"itemgran\"]\n",
+							"for index, row in portfolioData.iterrows():\n",
+							"    df_result = pd.DataFrame(columns = result_columns)\n",
+							"    filePath = '/PortfolioQuotes/HistoricalData/' + row.Ticker + '.csv'\n",
+							"    df_res = run_forecast(filePath, row.Portfolio, row.Sector, row.Ticker, 'daily')\n",
+							"    df_result = df_result.append(df_res)\n",
+							"    output = df_result.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+							"    blobName = \"PortfolioQuotes/PortfolioForecast/\" + row.Ticker + \".csv\"\n",
+							"    blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+							"    blob.upload_blob(output)\n",
+							"    #break\n",
+							"#df_result.shape  \n",
+							"#df_result.to_csv('/dbfs/mnt/ncmriskstorage/StockPricesForecastAutoMLforecast.csv',index=False)"
+						],
+						"outputs": [],
+						"execution_count": 13
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_stock timeseries forecast automl')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "22168657-2e31-4e96-b540-63a4fd0420d5"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "python"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import azureml.core\n",
+							"import pandas as pd\n",
+							"import numpy as np\n",
+							"import logging\n",
+							"\n",
+							"from azureml.core.workspace import Workspace\n",
+							"from azureml.core.experiment import Experiment\n",
+							"from azureml.train.automl import AutoMLConfig\n",
+							"from azureml.automl.core.featurization import FeaturizationConfig"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"subscription_id = \"9c1bf73d-cfe5-4113-bc28-5f637bb222ad\"\n",
+							"resource_group = \"marketrisk\"\n",
+							"workspace_name = \"marketriskaml\"\n",
+							"workspace_region = \"eastus\""
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azureml.core import Workspace\n",
+							"\n",
+							"try:\n",
+							"    ws = Workspace(subscription_id = subscription_id, resource_group = resource_group, workspace_name = workspace_name)\n",
+							"    # write the details of the workspace to a configuration file to the notebook library\n",
+							"    ws.write_config()\n",
+							"    print(\"Workspace configuration succeeded. Skip the workspace creation steps below\")\n",
+							"except:\n",
+							"    print(\"Workspace not accessible. Change your parameters or create a new workspace below\")"
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"ws = Workspace.from_config()\n",
+							"\n",
+							"# choose a name for the run history container in the workspace\n",
+							"experiment_name = 'automl-stockprice'\n",
+							"experiment = Experiment(ws, experiment_name)\n",
+							"output = {}\n",
+							"output['SDK version'] = azureml.core.VERSION\n",
+							"output['Subscription ID'] = ws.subscription_id\n",
+							"output['Workspace'] = ws.name\n",
+							"output['SKU'] = ws.sku\n",
+							"output['Resource Group'] = ws.resource_group\n",
+							"output['Location'] = ws.location\n",
+							"output['Run History Name'] = experiment_name\n",
+							"\n",
+							"pd.set_option('display.max_colwidth', None)\n",
+							"outputDf = pd.DataFrame(data = output, index = [''])"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azureml.core.compute import AmlCompute\n",
+							"from azureml.core.compute import ComputeTarget\n",
+							"\n",
+							"# Choose a name for your cluster.\n",
+							"amlcompute_cluster_name = \"cpu-cluster\"\n",
+							"found = False\n",
+							"\n",
+							"# Check if this compute target already exists in the workspace.\n",
+							"cts = ws.compute_targets\n",
+							"if amlcompute_cluster_name in cts and cts[amlcompute_cluster_name].type == 'AmlCompute':\n",
+							"    found = True\n",
+							"    print('Found existing compute target.')\n",
+							"    compute_target = cts[amlcompute_cluster_name]\n",
+							"\n",
+							"if not found:\n",
+							"    print('Creating a new compute target...')\n",
+							"    provisioning_config = AmlCompute.provisioning_configuration(vm_size = \"STANDARD_D2_V2\", max_nodes = 2)\n",
+							"    # Create the cluster\n",
+							"    compute_target = ComputeTarget.create(ws, amlcompute_cluster_name, provisioning_config)\n",
+							"\n",
+							"# Can poll for a minimum number of nodes and for a specific timeout.\n",
+							"# If no min_node_count is provided, it will use the scale settings for the cluster.\n",
+							"compute_target.wait_for_completion(show_output = True, min_node_count = None, timeout_in_minutes = 20)"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Ticker"
+									],
+									"yLabel": "Ticker",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": true,
+									"isValid": true,
+									"inValidMsg": null,
+									"series": "Ticker"
+								},
+								"aggData": "{\"PG\":{\"Covid\":1001}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/PortfolioQuotes/HistoricalData', \n",
+							"    format='csv', \n",
+							"    sep=\",\",\n",
+							"    header=True)\n",
+							"\n",
+							"portfolioData = nqSdf.toPandas()\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"msftTicker = ['MSFT']\n",
+							"msftData = portfolioData[portfolioData.Ticker.isin(msftTicker)]\n",
+							"msftData = msftData.drop(columns=['Portfolio', 'Sector', 'Cik', 'Ticker'])\n",
+							"msftData = msftData.set_index('Date')\n",
+							"msftData"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import pandas as pd\n",
+							"from pandas import DataFrame\n",
+							"from pandas import Grouper\n",
+							"from pandas import concat\n",
+							"from pandas.plotting import register_matplotlib_converters\n",
+							"from matplotlib import pyplot as plt\n",
+							"\n",
+							"register_matplotlib_converters()\n",
+							"plt.figure(figsize=(20, 10))\n",
+							"plt.tight_layout()"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"target_column_name = 'AdjClose'\n",
+							"time_column_name = 'Date'\n",
+							"time_series_id_column_names = []\n",
+							"freq = 'M' #Monthly data"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import pandas as pd\n",
+							"from azureml.core import Environment\n",
+							"from azureml.core.conda_dependencies import CondaDependencies\n",
+							"from azureml.train.estimator import Estimator\n",
+							"from azureml.core.run import Run\n",
+							"\n",
+							"\n",
+							"def split_fraction_by_grain(df, fraction, time_column_name,\n",
+							"                            grain_column_names=None):\n",
+							"\n",
+							"    if not grain_column_names:\n",
+							"        df['tmp_grain_column'] = 'grain'\n",
+							"        grain_column_names = ['tmp_grain_column']\n",
+							"\n",
+							"    \"\"\"Group df by grain and split on last n rows for each group.\"\"\"\n",
+							"    df_grouped = (df.sort_values(time_column_name)\n",
+							"                  .groupby(grain_column_names, group_keys=False))\n",
+							"\n",
+							"    df_head = df_grouped.apply(lambda dfg: dfg.iloc[:-int(len(dfg) *\n",
+							"                               fraction)] if fraction > 0 else dfg)\n",
+							"\n",
+							"    df_tail = df_grouped.apply(lambda dfg: dfg.iloc[-int(len(dfg) *\n",
+							"                               fraction):] if fraction > 0 else dfg[:0])\n",
+							"\n",
+							"    if 'tmp_grain_column' in grain_column_names:\n",
+							"        for df2 in (df, df_head, df_tail):\n",
+							"            df2.drop('tmp_grain_column', axis=1, inplace=True)\n",
+							"\n",
+							"        grain_column_names.remove('tmp_grain_column')\n",
+							"\n",
+							"    return df_head, df_tail\n",
+							"\n",
+							"\n",
+							"def split_full_for_forecasting(df, time_column_name,\n",
+							"                               grain_column_names=None, test_split=0.2):\n",
+							"    index_name = df.index.name\n",
+							"\n",
+							"    # Assumes that there isn't already a column called tmpindex\n",
+							"\n",
+							"    df['tmpindex'] = df.index\n",
+							"\n",
+							"    train_df, test_df = split_fraction_by_grain(\n",
+							"        df, test_split, time_column_name, grain_column_names)\n",
+							"\n",
+							"    train_df = train_df.set_index('tmpindex')\n",
+							"    train_df.index.name = index_name\n",
+							"\n",
+							"    test_df = test_df.set_index('tmpindex')\n",
+							"    test_df.index.name = index_name\n",
+							"\n",
+							"    df.drop('tmpindex', axis=1, inplace=True)\n",
+							"\n",
+							"    return train_df, test_df\n",
+							"\n",
+							"\n",
+							"def get_result_df(remote_run):\n",
+							"    children = list(remote_run.get_children(recursive=True))\n",
+							"    summary_df = pd.DataFrame(index=['run_id', 'run_algorithm',\n",
+							"                                     'primary_metric', 'Score'])\n",
+							"    goal_minimize = False\n",
+							"    for run in children:\n",
+							"        if('run_algorithm' in run.properties and 'score' in run.properties):\n",
+							"            summary_df[run.id] = [run.id, run.properties['run_algorithm'],\n",
+							"                                  run.properties['primary_metric'],\n",
+							"                                  float(run.properties['score'])]\n",
+							"            if('goal' in run.properties):\n",
+							"                goal_minimize = run.properties['goal'].split('_')[-1] == 'min'\n",
+							"\n",
+							"    summary_df = summary_df.T.sort_values(\n",
+							"        'Score',\n",
+							"        ascending=goal_minimize).drop_duplicates(['run_algorithm'])\n",
+							"    summary_df = summary_df.set_index('run_algorithm')\n",
+							"    return summary_df"
+						],
+						"outputs": [],
+						"execution_count": 11
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"train, test = split_full_for_forecasting(msftData, time_column_name)\n",
+							"train.to_csv(\"train.csv\")\n",
+							"test.to_csv(\"test.csv\")\n",
+							"\n",
+							"datastore = ws.get_default_datastore()\n",
+							"datastore.upload_files(files = ['./train.csv'], target_path = 'msft-dataset/tabular/', overwrite = True,show_progress = True)\n",
+							"datastore.upload_files(files = ['./test.csv'], target_path = 'msft-dataset/tabular/', overwrite = True,show_progress = True)\n",
+							"\n",
+							"from azureml.core import Dataset\n",
+							"train_dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, 'msft-dataset/tabular/train.csv')])\n",
+							"test_dataset = Dataset.Tabular.from_delimited_files(path = [(datastore, 'msft-dataset/tabular/test.csv')])"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"test"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"forecast_horizon = 12\n",
+							"from azureml.automl.core.forecasting_parameters import ForecastingParameters\n",
+							"forecasting_parameters = ForecastingParameters(\n",
+							"    time_column_name=time_column_name, forecast_horizon=forecast_horizon\n",
+							")\n",
+							"\n",
+							"automl_config = AutoMLConfig(task='forecasting',                             \n",
+							"                             primary_metric='normalized_root_mean_squared_error',\n",
+							"                             experiment_timeout_hours = 0.25,\n",
+							"                             training_data=train_dataset,\n",
+							"                             label_column_name=target_column_name,\n",
+							"                             validation_data=test_dataset, \n",
+							"                             verbosity=logging.INFO,\n",
+							"                             compute_target=compute_target,\n",
+							"                             max_concurrent_iterations=4,\n",
+							"                             max_cores_per_iteration=-1,\n",
+							"                             enable_dnn=True,\n",
+							"                             forecasting_parameters=forecasting_parameters)"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"remote_run = experiment.submit(automl_config, show_output= False)\n",
+							"remote_run"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"remote_run.wait_for_completion()"
+						],
+						"outputs": [],
+						"execution_count": 20
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"summary_df = get_result_df(remote_run)\n",
+							"summary_df"
+						],
+						"outputs": [],
+						"execution_count": 21
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"time_column_name = 'Date'\n",
+							"grain_column_names = ['Ticker', 'Portfolio']\n",
+							"nseries = portfolioData.groupby(grain_column_names).ngroups\n",
+							"print('Data contains {0} individual time-series.'.format(nseries))"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"use_tickers = ['MSFT', 'COST', 'WMT']\n",
+							"data_subset = portfolioData[portfolioData.Ticker.isin(use_tickers)]\n",
+							"nseries = data_subset.groupby(grain_column_names).ngroups\n",
+							"print('Data subset contains {0} individual time-series.'.format(nseries))"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"n_test_periods = 20\n",
+							"def split_last_n(df, n):\n",
+							"\n",
+							"    \"\"\"Group df and split on last n rows for each group.\"\"\"\n",
+							"    df_grouped = (df.sort_values(time_column_name).groupby(grain_column_names, group_keys=False))\n",
+							"    df_head = df_grouped.apply(lambda dfg: dfg.iloc[:-n])\n",
+							"    df_tail = df_grouped.apply(lambda dfg: dfg.iloc[-n:])\n",
+							"    return df_head, df_tail\n",
+							"\n",
+							"train, test = split_last_n(data_subset, n_test_periods)"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"diagram": {
+								"activateDiagramType": 1,
+								"chartConfig": {
+									"category": "bar",
+									"keys": [
+										"Portfolio"
+									],
+									"values": [
+										"Portfolio"
+									],
+									"yLabel": "Portfolio",
+									"xLabel": "Portfolio",
+									"aggregation": "COUNT",
+									"aggByBackend": false
+								},
+								"aggData": "{\"Portfolio\":{\"Covid\":1001}}",
+								"isSummary": false,
+								"previewData": {
+									"filter": null
+								},
+								"isSql": false
+							}
+						},
+						"source": [
+							"train.to_csv (r'./stock_train.csv', index = None, header=True)\n",
+							"test.to_csv (r'./stock_test.csv', index = None, header=True) "
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"datastore = ws.get_default_datastore()\n",
+							"datastore.upload_files(files = ['./stock_train.csv', './stock_test.csv'], target_path = 'dataset/', overwrite = True,show_progress = True)\n",
+							"\n",
+							"#Let’s now create the dataset that we will use for our training part:\n",
+							"from azureml.core.dataset import Dataset\n",
+							"train_dataset = Dataset.Tabular.from_delimited_files(path=datastore.path('dataset/stock_train.csv'))\n",
+							"\n",
+							"train_dataset.to_pandas_dataframe().tail()"
+						],
+						"outputs": [],
+						"execution_count": 18
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"target_column_name = 'AdjClose'"
+						],
+						"outputs": [],
+						"execution_count": 19
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"featurization_config = FeaturizationConfig()\n",
+							"featurization_config.drop_columns = ['Sector']  # 'logQuantity' is a leaky feature, so we remove it.\n",
+							"# Force the CPWVOL5 feature to be numeric type.\n",
+							"#featurization_config.add_column_purpose('CPWVOL5', 'Numeric')\n",
+							"# Fill missing values in the target column, Quantity, with zeros.\n",
+							"#featurization_config.add_transformer_params('Imputer', ['Quantity'], {\"strategy\": \"constant\", \"fill_value\": 0})\n",
+							"# Fill missing values in the INCOME column with median value.\n",
+							"#featurization_config.add_transformer_params('Imputer', ['INCOME'], {\"strategy\": \"median\"})\n",
+							"# Fill missing values in the Price column with forward fill (last value carried forward).\n",
+							"#featurization_config.add_transformer_params('Imputer', ['Price'], {\"strategy\": \"ffill\"})"
+						],
+						"outputs": [],
+						"execution_count": 26
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azureml.automl.core.forecasting_parameters import ForecastingParameters\n",
+							"\n",
+							"forecasting_parameters = ForecastingParameters(\n",
+							"    time_column_name=time_column_name,\n",
+							"    forecast_horizon=n_test_periods,\n",
+							"    time_series_id_column_names=grain_column_names\n",
+							")\n",
+							"\n",
+							"automl_config = AutoMLConfig(task='forecasting',\n",
+							"                             debug_log='automl_errors.log',\n",
+							"                             primary_metric='normalized_mean_absolute_error',\n",
+							"                             experiment_timeout_hours=0.25,\n",
+							"                             training_data=train_dataset,\n",
+							"                             label_column_name=target_column_name,\n",
+							"                             compute_target=compute_target,\n",
+							"                             enable_early_stopping=True,\n",
+							"                             featurization=featurization_config,\n",
+							"                             n_cross_validations=3,\n",
+							"                             verbosity=logging.INFO,\n",
+							"                             max_cores_per_iteration=-1,\n",
+							"                             forecasting_parameters=forecasting_parameters)"
+						],
+						"outputs": [],
+						"execution_count": 28
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"remote_run = experiment.submit(automl_config, show_output=False)\n",
+							"remote_run\n",
+							"remote_run.wait_for_completion()"
+						],
+						"outputs": [],
+						"execution_count": 29
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"best_run, fitted_model = remote_run.get_output()\n",
+							"print(fitted_model.steps)\n",
+							"model_name = best_run.properties['model_name']"
+						],
+						"outputs": [],
+						"execution_count": 30
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"X_test = test\n",
+							"y_test = X_test.pop(target_column_name).values\n",
+							"X_test.head()"
+						],
+						"outputs": [],
+						"execution_count": 31
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# The featurized data, aligned to y, will also be returned.\n",
+							"# This contains the assumptions that were made in the forecast\n",
+							"# and helps align the forecast to the original data\n",
+							"y_predictions, X_trans = fitted_model.forecast(X_test)"
+						],
+						"outputs": [],
+						"execution_count": 32
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import pandas as pd\n",
+							"import numpy as np\n",
+							"from pandas.tseries.frequencies import to_offset\n",
+							"\n",
+							"\n",
+							"def align_outputs(y_predicted, X_trans, X_test, y_test, target_column_name,\n",
+							"                  predicted_column_name='predicted',\n",
+							"                  horizon_colname='horizon_origin'):\n",
+							"    \"\"\"\n",
+							"    Demonstrates how to get the output aligned to the inputs\n",
+							"    using pandas indexes. Helps understand what happened if\n",
+							"    the output's shape differs from the input shape, or if\n",
+							"    the data got re-sorted by time and grain during forecasting.\n",
+							"    Typical causes of misalignment are:\n",
+							"    * we predicted some periods that were missing in actuals -> drop from eval\n",
+							"    * model was asked to predict past max_horizon -> increase max horizon\n",
+							"    * data at start of X_test was needed for lags -> provide previous periods\n",
+							"    \"\"\"\n",
+							"\n",
+							"    if (horizon_colname in X_trans):\n",
+							"        df_fcst = pd.DataFrame({predicted_column_name: y_predicted,\n",
+							"                                horizon_colname: X_trans[horizon_colname]})\n",
+							"    else:\n",
+							"        df_fcst = pd.DataFrame({predicted_column_name: y_predicted})\n",
+							"\n",
+							"    # y and X outputs are aligned by forecast() function contract\n",
+							"    df_fcst.index = X_trans.index\n",
+							"\n",
+							"    # align original X_test to y_test\n",
+							"    X_test_full = X_test.copy()\n",
+							"    X_test_full[target_column_name] = y_test\n",
+							"\n",
+							"    # X_test_full's index does not include origin, so reset for merge\n",
+							"    df_fcst.reset_index(inplace=True)\n",
+							"    X_test_full = X_test_full.reset_index().drop(columns='index')\n",
+							"    together = df_fcst.merge(X_test_full, how='right')\n",
+							"\n",
+							"    # drop rows where prediction or actuals are nan\n",
+							"    # happens because of missing actuals\n",
+							"    # or at edges of time due to lags/rolling windows\n",
+							"    clean = together[together[[target_column_name,\n",
+							"                               predicted_column_name]].notnull().all(axis=1)]\n",
+							"    return(clean)"
+						],
+						"outputs": [],
+						"execution_count": 33
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"df_all = align_outputs(y_predictions, X_trans, X_test, y_test, target_column_name)\n",
+							"\n",
+							"from azureml.automl.core._vendor.automl.client.core.common import metrics\n",
+							"from automl.client.core.common import constants\n",
+							"\n",
+							"# use automl metrics module\n",
+							"scores = metrics.compute_metrics_regression(\n",
+							"    df_all['predicted'],\n",
+							"    df_all[target_column_name],\n",
+							"    list(constants.Metric.SCALAR_REGRESSION_SET),\n",
+							"    None, None, None)\n",
+							"\n",
+							"print(\"[Test data scores]\\n\")\n",
+							"for key, value in scores.items():   \n",
+							"    print('{}:   {:.3f}'.format(key, value))\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 34
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"# Plot outputs\n",
+							"from matplotlib import pyplot as plt\n",
+							"\n",
+							"test_pred = plt.scatter(df_all[target_column_name], df_all['predicted'], color='b')\n",
+							"test_test = plt.scatter(df_all[target_column_name], df_all[target_column_name], color='g')\n",
+							"plt.legend((test_pred, test_test), ('prediction', 'truth'), loc='upper left', fontsize=8)\n",
+							"plt.show()"
+						],
+						"outputs": [],
+						"execution_count": 35
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/3_score and store tweets')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "68dad71f-0ee7-49b7-ac56-3a370cc8067b"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"source": [
+							"import pkg_resources\n",
+							"for d in pkg_resources.working_set:\n",
+							"     print(d)"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import urllib.parse, base64\n",
+							"import json\n",
+							"import requests\n",
+							"import pandas as pd\n",
+							"import datetime\n",
+							"import pytz\n",
+							"from azure.core.credentials import AzureKeyCredential\n",
+							"from azure.ai.textanalytics import TextAnalyticsClient\n",
+							"\n",
+							"#sentiment_url = 'https://southcentralus.api.cognitive.microsoft.com/text/analytics/v3.0/sentiment' # service address \n",
+							"sentiment_url = 'https://twittercog64.cognitiveservices.azure.com/'\n",
+							"api_key = '2383634b398945b682b4c6ff9cd13cc5'          # Azure Cognitive API Key, replace with your own key\n",
+							"\n",
+							"\n",
+							"credential = AzureKeyCredential(api_key)\n",
+							"text_analytics_client = TextAnalyticsClient(endpoint=sentiment_url, credential=credential)"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"from azure.storage.blob import BlobServiceClient, ContainerClient , BlobClient\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\"\n",
+							"\n",
+							"containerName = \"risk\"\n",
+							"blobService = BlobServiceClient(connectionString)\n",
+							"containerService = ContainerClient.from_connection_string(connectionString, containerName)"
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import datetime\n",
+							"import pytz\n",
+							"\n",
+							"currDate = datetime.datetime.now(pytz.timezone('US/Central'))\n",
+							"blobName = \"TwitterData/\" + str(currDate.year) + \"/\" + str(currDate.month).zfill(2) + \"/\" + str(currDate.day -1) \n",
+							"\n",
+							"filename_prefix = \"/\" + blobName \n",
+							"\n",
+							"\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": true
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\r\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \r\n",
+							"    format='csv', \r\n",
+							"    sep=\",\",\r\n",
+							"    header=True)\r\n",
+							"\r\n",
+							"portfolioData = nqSdf.toPandas()\r\n",
+							"display(portfolioData)\r\n",
+							"\r\n",
+							"\r\n",
+							"\r\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": null
+					},
+					{
+						"cell_type": "code",
+						"source": [
+							"import glob\n",
+							"import re \n",
+							"\n",
+							"#Get all the tweets generated for the symbols in the portfolio\n",
+							"allticker = pd.DataFrame()\n",
+							"for index, portfolio in portfolioData.iterrows():\n",
+							"   print(\"ticker\", portfolio.Ticker)\n",
+							"   if portfolio.Ticker :\n",
+							"      print(\"prefix\", filename_prefix)\n",
+							"      filename_objects = containerService.list_blobs(name_starts_with= filename_prefix)\n",
+							"      filtered = [fileinfo.name for fileinfo in filename_objects if portfolio.Ticker in fileinfo.name]\n",
+							"      print(filtered)\n",
+							"\n",
+							"      consolidatedtweets = pd.DataFrame()\n",
+							"      scoredTweets = pd.DataFrame()\n",
+							"\n",
+							"\n",
+							"#itterate over files and consolidate tweets \n",
+							"      for tickerfilename in filtered : \n",
+							"        absolouteFileName = \"abfss://risk@marketriskdl.dfs.core.windows.net/\" + tickerfilename\n",
+							"        nqSdf = spark.read.format('csv') \\\n",
+							"                    .option('header',True) \\\n",
+							"                    .option('multiLine', True) \\\n",
+							"                    .load(absolouteFileName)\n",
+							"        print(\"fileName\" , absolouteFileName)\n",
+							"        consolidatedtweets = consolidatedtweets.append(nqSdf.toPandas())\n",
+							"     \n",
+							"#Drop duplicates from consolidated         \n",
+							"      print(\"Before drop\", consolidatedtweets.shape[0])\n",
+							"      consolidatedtweets = consolidatedtweets.drop_duplicates(subset=['TweetText'])\n",
+							"      print(\"After Drop\", consolidatedtweets.shape[0])\n",
+							"      consolidatedtweets = consolidatedtweets[consolidatedtweets['TweetLanguage'] == 'en']  \n",
+							"\n",
+							"      consolidatedtweets['Location'] = consolidatedtweets['Location\\r'].str.strip(r'\\\\r').astype(str)\n",
+							"      consolidatedtweets = consolidatedtweets.drop(columns='Location\\r')\n",
+							"\n",
+							"\n",
+							"#Score and add to scoredtweets\n",
+							"      for index, tweet in consolidatedtweets.iterrows():\n",
+							"            documents = []\n",
+							"            mentions = re.findall(\"@([a-zA-Z0-9]{1,15})\", tweet.TweetText)\n",
+							"            topics = re.findall(\"#([a-zA-Z0-9]{1,15})\", tweet.TweetText)\n",
+							"            documents.append (\"'\" + tweet.TweetText + \"'\")\n",
+							"            for text in mentions: text = re.sub('\\W+',' ', text)\n",
+							"            for text1 in topics: text1= re.sub('\\W+',' ', text1)\n",
+							"            tweet['mentions'] =   mentions\n",
+							"            tweet['topics'] =  topics\n",
+							"            tweet['Ticker'] = portfolio.Ticker\n",
+							"            response = text_analytics_client.analyze_sentiment(documents, language=\"en\")\n",
+							"            result = [doc for doc in response if not doc.is_error]\n",
+							"            tweet['sentiment'] = result[0].sentiment\n",
+							"            tweet['positive'] = result[0].confidence_scores.positive\n",
+							"            tweet['negative'] = result[0].confidence_scores.negative\n",
+							"            tweet['neutral'] = result[0].confidence_scores.neutral\n",
+							"            tweet.TweetText = re.sub('\\W+',' ', tweet.TweetText)\n",
+							"\n",
+							"            if tweet.Location : \n",
+							"              tweet.Location = tweet.Location.rstrip('\\r')\n",
+							"            else :\n",
+							"              tweet.Location = \" \"\n",
+							"              tweet.Location = tweet.Location.rstrip('\\r')\n",
+							"            \n",
+							"            scoredTweets = scoredTweets.append(tweet,ignore_index=True) \n",
+							"      allticker = allticker.append(scoredTweets)\n",
+							"      output = scoredTweets.to_csv(index=False, header=True, encoding = \"utf-8\")\n",
+							"      \n",
+							"\n",
+							"      blobName = \"TwitterData/scored/\" + str(currDate.year) + \"/\" + str(currDate.month) + \"/\" + str(currDate.day) + \"/\" + portfolio.Ticker + \".csv\"\n",
+							"      blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+							"      blob.upload_blob(output)\n",
+							"    \n",
+							"\n",
+							" outputall = allticker.to_csv(index=False, header=True, encoding = \"utf-8\")\n",
+							"      \n",
+							"\n",
+							"  blobNameall = \"TwitterData/scored/\" + str(currDate.year) + \"/\" + str(currDate.month) + \"/\" + str(currDate.day) + \"/\" + \"allticker\" + \".csv\"\n",
+							"  bloball = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobNameall)\n",
+							"  bloball.upload_blob(outputall)\n",
+							"\n",
+							"      \n",
+							"    \n",
+							"        \n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"           \n",
+							"\n",
+							"\n",
+							"  \n",
+							"\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 14
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/3_score and store tweets_0')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Risk"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "ab146114-9d69-4b22-be70-f1f2acc996df"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"import pip #needed to use the pip functions\n",
+							"for i in pip.get_installed_distributions(local_only=True):print(i)"
+						],
+						"outputs": [],
+						"execution_count": 1
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"import urllib.parse, base64\n",
+							"import json\n",
+							"import requests\n",
+							"import pandas as pd\n",
+							"import datetime\n",
+							"import pytz\n",
+							"from azure.core.credentials import AzureKeyCredential\n",
+							"from azure.ai.textanalytics import TextAnalyticsClient\n",
+							"\n",
+							"#sentiment_url = 'https://southcentralus.api.cognitive.microsoft.com/text/analytics/v3.0/sentiment' # service address \n",
+							"sentiment_url = 'https://markettweetsentimentanalysis.cognitiveservices.azure.com/'\n",
+							"api_key = '4d3f9732c7f947cebc33c14db5c94b4e'          # Azure Cognitive API Key, replace with your own key\n",
+							"\n",
+							"\n",
+							"credential = AzureKeyCredential(api_key)\n",
+							"text_analytics_client = TextAnalyticsClient(endpoint=sentiment_url, credential=credential)"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"from azure.storage.blob import (\n",
+							"    BlockBlobService\n",
+							")\n",
+							"\n",
+							"accountName = \"marketriskdl\"\n",
+							"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+							"containerName = \"risk\"\n",
+							"\n",
+							"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)"
+						],
+						"outputs": [],
+						"execution_count": 3
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"import datetime\n",
+							"import pytz\n",
+							"\n",
+							"currDate = datetime.datetime.now(pytz.timezone('US/Central'))\n",
+							"blobName = \"TwitterData/\" + str(currDate.year) + \"/\" + str(currDate.month) + \"/\" + str(currDate.day - 1)\n",
+							"print(blobName)\n",
+							"\n",
+							"   "
+						],
+						"outputs": [],
+						"execution_count": 4
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"collapsed": false
+						},
+						"source": [
+							"# Read out CSV file with list of all tickers\r\n",
+							"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \r\n",
+							"    format='csv', \r\n",
+							"    sep=\",\",\r\n",
+							"    header=True)\r\n",
+							"\r\n",
+							"portfolioData = nqSdf.toPandas()\r\n",
+							"display(portfolioData)"
+						],
+						"outputs": [],
+						"execution_count": 5
+					},
+					{
+						"cell_type": "code",
+						"metadata": {},
+						"source": [
+							"import glob\n",
+							"import re \n",
+							"\n",
+							"filename_prefix = \"/\" + blobName \n",
+							"filename_objects = blobService.list_blobs('risk', prefix = filename_prefix)\n",
+							"#print(filename_objects)\n",
+							"\n",
+							"for index, portfolio in portfolioData.iterrows():\n",
+							"   print(portfolio.Ticker)\n",
+							"   if portfolio.Ticker :\n",
+							"      filtered = [fileinfo.name for fileinfo in filename_objects if portfolio.Ticker in fileinfo.name]\n",
+							"      print(filtered)\n",
+							"      consolidatedtweets = pd.DataFrame()\n",
+							"\n",
+							"      for tickerfilename in filtered : \n",
+							"        absolouteFileName = \"abfss://risk@marketriskdl.dfs.core.windows.net/\" + tickerfilename\n",
+							"        print(absolouteFileName)\n",
+							"        nqSdf = spark.read.format('csv') \\\n",
+							"                    .option('header',True) \\\n",
+							"                    .option('multiLine', True) \\\n",
+							"                    .load(absolouteFileName)\n",
+							"        \n",
+							"        consolidatedtweets = consolidatedtweets.append(nqSdf.toPandas())\n",
+							"        scoredTweets = pd.DataFrame()\n",
+							"        consolidatedtweets['Location'] = consolidatedtweets['Location\\r'].str.strip(r'\\\\r').astype(str)\n",
+							"        consolidatedtweets = consolidatedtweets.drop(columns='Location\\r')\n",
+							"        \n",
+							"      print(\"Before drop\", consolidatedtweets.shape[0])\n",
+							"      consolidatedtweets = consolidatedtweets.drop_duplicates(subset=['TweetText'])\n",
+							"      print(\"After Drop\", consolidatedtweets.shape[0])\n",
+							"\n",
+							"      for index, tweet in consolidatedtweets.iterrows():\n",
+							"            documents = []\n",
+							"            mentions = re.findall(\"@([a-zA-Z0-9]{1,15})\", tweet.TweetText)\n",
+							"            topics = re.findall(\"#([a-zA-Z0-9]{1,15})\", tweet.TweetText)\n",
+							"            documents.append (\"'\" + tweet.TweetText + \"'\")\n",
+							"            tweet['mentions'] = mentions\n",
+							"            tweet['topics'] = topics\n",
+							"            tweet['Ticker'] = portfolio.Ticker\n",
+							"            response = text_analytics_client.analyze_sentiment(documents, language=\"en\")\n",
+							"            result = [doc for doc in response if not doc.is_error]\n",
+							"            tweet['sentiment'] = result[0].sentiment\n",
+							"            tweet['positive'] = result[0].confidence_scores.positive\n",
+							"            tweet['negative'] = result[0].confidence_scores.negative\n",
+							"            tweet['neutral'] = result[0].confidence_scores.neutral\n",
+							"\n",
+							"            if tweet.Location : \n",
+							"              tweet.Location = tweet.Location.rstrip('\\r')\n",
+							"            else :\n",
+							"              tweet.Location = \" \"\n",
+							"              tweet.Location = tweet.Location.rstrip('\\r')\n",
+							"            \n",
+							"            scoredTweets = scoredTweets.append(tweet,ignore_index=True) \n",
+							"\n",
+							"      output = scoredTweets.to_csv(index=False, header=True, encoding = \"utf-8\")\n",
+							"      blobService.create_blob_from_text(containerName,  \"TwitterData/scored/\" + str(currDate.year) + \"/\" + str(currDate.month) + \"/\" + str(currDate.day) + \"/\" + portfolio.Ticker + \".csv\", output)\n",
+							"    \n",
+							"\n",
+							"\n",
+							"\n",
+							"      \n",
+							"    \n",
+							"        \n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"\n",
+							"           \n",
+							"\n",
+							"\n",
+							"  \n",
+							"\n",
+							""
+						],
+						"outputs": [],
+						"execution_count": 16
 					}
 				]
 			},
