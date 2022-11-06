@@ -1,0 +1,166 @@
+{
+	"name": "0_portfolio cik",
+	"properties": {
+		"folder": {
+			"name": "Risk"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "6a62321b-2406-4ab6-8f0e-8f9060fbe3a3"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"# Required packages\n",
+					"import re\n",
+					"import requests\n",
+					"import pandas as pd"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"#Define the secURL and the regex to be used\n",
+					"secUrl = 'http://www.sec.gov/cgi-bin/browse-edgar?CIK={}&Find=Search&owner=exclude&action=getcompany'\n",
+					"cikRegEx = re.compile(r'.CIK=(\\d{10}).')"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Load our data into Dataframe\n",
+					"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/Portfolio.csv', \n",
+					"    format='csv', \n",
+					"    sep=\",\",\n",
+					"    header=True)\n",
+					"\n",
+					"nqPdf = nqSdf.toPandas()"
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"diagram": {
+						"activateDiagramType": 1,
+						"chartConfig": {
+							"category": "bar",
+							"keys": [
+								"Portfolio"
+							],
+							"values": [
+								"Portfolio"
+							],
+							"yLabel": "Portfolio",
+							"xLabel": "Portfolio",
+							"aggregation": "COUNT",
+							"aggByBackend": false
+						},
+						"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+						"isSummary": false,
+						"previewData": {
+							"filter": null
+						},
+						"isSql": false
+					}
+				},
+				"source": [
+					"display(nqPdf)"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from time import sleep\n",
+					"from azure.storage.blob import (\n",
+					"    BlockBlobService\n",
+					")\n",
+					"\n",
+					"# Create empty data frame\n",
+					"finalColNames = [\"Portfolio\", \"Sector\", \"Ticker\", \"CreatedDate\", \"CIK\"]\n",
+					"finalDf = pd.DataFrame(columns = finalColNames)\n",
+					"\n",
+					"# Iterate through all ticker data to find out the CIK from sec website\n",
+					"for index, ticker in nqPdf.iterrows():\n",
+					"    sleep(2)\n",
+					"    f = requests.get(secUrl.format(ticker['Ticker']), stream=True);\n",
+					"    results = cikRegEx.findall(f.text)\n",
+					"    if len(results):\n",
+					"        finalDf = finalDf.append({'Portfolio' : str(ticker['Portfolio']) , 'Sector' : ticker['Sector'], 'Ticker' : ticker['Ticker'], 'CreatedDate' : ticker['CreatedDate'], 'CIK' : str(results[0]) } , ignore_index=True)\n",
+					"\n",
+					"# Write CSV file \n",
+					"# storage_path = 'abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv'\n",
+					"# sDf = spark.createDataFrame(finalDf)\n",
+					"# sDf.coalesce(1).write.mode(\"overwrite\").csv(storage_path, header=\"true\")\n",
+					"output = finalDf.to_csv(index=False, encoding = \"utf-8\")\n",
+					"accountName = \"marketriskdl\"\n",
+					"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+					"containerName = \"risk\"\n",
+					"blobName = \"Portfolio/PortfolioCik.csv\"\n",
+					"\n",
+					"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)\n",
+					"\n",
+					"# Delete existing blob\n",
+					"blobService.delete_blob(containerName,blobName,snapshot=None)\n",
+					"\n",
+					"blobService.create_blob_from_text(containerName, blobName, output)\n",
+					""
+				],
+				"execution_count": 16
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

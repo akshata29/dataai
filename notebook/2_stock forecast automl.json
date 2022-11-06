@@ -1,0 +1,459 @@
+{
+	"name": "2_stock forecast automl",
+	"properties": {
+		"folder": {
+			"name": "Risk"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "0ee47912-4363-481a-a779-ea3f515982e6"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "Synapse PySpark"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"import azureml.core\n",
+					"import pandas as pd\n",
+					"import numpy as np\n",
+					"import logging\n",
+					"\n",
+					"from azureml.core.workspace import Workspace\n",
+					"from azureml.core.experiment import Experiment\n",
+					"from azureml.train.automl import AutoMLConfig\n",
+					"from azureml.automl.core.featurization import FeaturizationConfig\n",
+					"#print(\"SDK Version:\", azureml.core.VERSION)\n",
+					"\n",
+					"from azureml.data.datapath import DataPath\n",
+					"from azureml.core import Datastore\n",
+					"from azureml.core.dataset import Dataset\n",
+					"from azureml.train.automl import AutoMLConfig\n",
+					"from azureml.train.automl.run import AutoMLRun\n",
+					"import azureml.core\n",
+					"import logging\n",
+					"import numpy as np\n",
+					"import pandas as pd\n",
+					"from azureml.core.compute import AmlCompute\n",
+					"from azureml.core.compute import ComputeTarget\n",
+					"from pandas.tseries.offsets import *\n",
+					"from datetime import datetime, timedelta"
+				],
+				"execution_count": 84
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"subscription_id = \"9c1bf73d-cfe5-4113-bc28-5f637bb222ad\"\n",
+					"resource_group = \"marketrisk\"\n",
+					"workspace_name = \"marketriskaml\"\n",
+					"workspace_region = \"eastus\"\n",
+					"\n",
+					"ws = Workspace(workspace_name = workspace_name,\n",
+					"               subscription_id = subscription_id,\n",
+					"               resource_group = resource_group)\n",
+					"#ws.get_details()"
+				],
+				"execution_count": 85
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"## Create a new datastore\n",
+					"adlsDsName ='stockautoml'\n",
+					"adlsName = 'marketriskdl'\n",
+					"tenantId = '72f988bf-86f1-41af-91ab-2d7cd011db47'\n",
+					"clientId = '02c58df9-4f1d-444d-9077-1bf0769fcdfa'\n",
+					"clientSecret = '1IS7k9CZKC6MGAd_ll~.dL78yc-9x4wXTQ'\n",
+					"\n",
+					"try:\n",
+					"    adls_datastore = Datastore.get(ws, adlsDsName)\n",
+					"    print(\"Found Blob Datastore with name: %s\" % adls_datastore)\n",
+					"except HttpOperationError:\n",
+					"    adls_datastore = Datastore.register_azure_data_lake(workspace=ws, datastore_name=adlsDsName, subscription_id=subscription_id, resource_group=resource_group, store_name=adlsName, tenant_id=tenantId, client_id=clientId, client_secret=clientSecret)"
+				],
+				"execution_count": 86
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"diagram": {
+						"activateDiagramType": 1,
+						"chartConfig": {
+							"category": "bar",
+							"keys": [
+								"Portfolio"
+							],
+							"values": [
+								"Portfolio"
+							],
+							"yLabel": "Portfolio",
+							"xLabel": "Portfolio",
+							"aggregation": "COUNT",
+							"aggByBackend": false
+						},
+						"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+						"isSummary": false,
+						"previewData": {
+							"filter": null
+						},
+						"isSql": false
+					},
+					"collapsed": false
+				},
+				"source": [
+					"# Read out CSV file with list of all tickers\n",
+					"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+					"    format='csv', \n",
+					"    sep=\",\",\n",
+					"    header=True)\n",
+					"\n",
+					"portfolioData = nqSdf.toPandas()\n",
+					"display(portfolioData)"
+				],
+				"execution_count": 87
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+					"from azure.storage.blob import BlobClient\n",
+					"\n",
+					"accountName = \"marketriskdl\"\n",
+					"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+					"containerName = \"risk\"\n",
+					"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+				],
+				"execution_count": 88
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Choose a name for your cluster.\n",
+					"amlcompute_cluster_name = \"cpu-cluster\"\n",
+					"found = False\n",
+					"\n",
+					"# Check if this compute target already exists in the workspace.\n",
+					"cts = ws.compute_targets\n",
+					"if amlcompute_cluster_name in cts and cts[amlcompute_cluster_name].type == 'AmlCompute':\n",
+					"    found = True\n",
+					"    print('Found existing compute target.')\n",
+					"    compute_target = cts[amlcompute_cluster_name]\n",
+					"\n",
+					"if not found:\n",
+					"    print('Creating a new compute target...')\n",
+					"    provisioning_config = AmlCompute.provisioning_configuration(vm_size = \"STANDARD_D2_V2\", max_nodes = 10)\n",
+					"    # Create the cluster\n",
+					"    compute_target = ComputeTarget.create(ws, amlcompute_cluster_name, provisioning_config)\n",
+					"\n",
+					"# Can poll for a minimum number of nodes and for a specific timeout.\n",
+					"# If no min_node_count is provided, it will use the scale settings for the cluster.\n",
+					"compute_target.wait_for_completion(show_output = True, min_node_count = None, timeout_in_minutes = 20)"
+				],
+				"execution_count": 89
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Initial variables\n",
+					"time_column_name = 'Date'\n",
+					"#grain_column_names = ['Ticker']\n",
+					"target_column_name = 'AdjClose'\n",
+					"n_test_periods = 10\n",
+					"drop_column_names = ['Portfolio', 'Sector','Ticker', 'Cik']"
+				],
+				"execution_count": 90
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"def run_forecast(row):  \n",
+					"  \n",
+					"  portfolio = row.Portfolio\n",
+					"  sector = row.Sector\n",
+					"  ticker = row.Ticker\n",
+					"  filePath = '/PortfolioQuotes/HistoricalData/' + row.Ticker + '.csv'\n",
+					"  timevar='daily'\n",
+					"  datastore_path = [DataPath(adls_datastore, filePath)]\n",
+					"  tabular = Dataset.Tabular.from_delimited_files(path=datastore_path)\n",
+					" \n",
+					"  experiment_name = ticker + 'automl'\n",
+					"  experiment = Experiment(ws, experiment_name)\n",
+					"   \n",
+					"  automl_config = AutoMLConfig(task = 'forecasting',\n",
+					"                             debug_log = 'automl_errors.log',\n",
+					"                             primary_metric = 'normalized_root_mean_squared_error',\n",
+					"                             iteration_timeout_minutes = 5,\n",
+					"                             experiment_timeout_minutes = 15,\n",
+					"                             enable_early_stopping = True,\n",
+					"                             n_cross_validations = 3,\n",
+					"                             iterations = 2,\n",
+					"                             #compute_target=compute_target,\n",
+					"                             verbosity = logging.INFO,\n",
+					"                             training_data=tabular,\n",
+					"                             drop_column_names = drop_column_names,\n",
+					"                             label_column_name=target_column_name,\n",
+					"                             time_column_name = time_column_name,\n",
+					"                             max_horizon = n_test_periods,\n",
+					"                             #blocked_models = ['ElasticNet','GradirentBoosting','DecisionTree','KNN','LassoLars','SGD','RandomForest','ExtremeRandomTrees','LightGBM', 'AutoArima', 'XGBoostRegressor'])\n",
+					"                             allowed_models = ['XGBoostRegressor'])\n",
+					"\n",
+					"  local_run = experiment.submit(automl_config, show_output = True)\n",
+					"  best_run, fitted_model = local_run.get_output()\n",
+					"  print(fitted_model.steps)\n",
+					"\n",
+					"  model_name = best_run.properties['model_name']\n",
+					"  print(model_name)\n",
+					"\n",
+					"  start = tabular.take(1).to_pandas_dataframe().iloc[0]['Date']\n",
+					"  end = datetime.now()\n",
+					"  p = (end - start).days + 365\n",
+					"  p\n",
+					"\n",
+					"  forecast_pd = pd.DataFrame({'Date' : tabular.to_pandas_dataframe()['Date']})\n",
+					"\n",
+					"  #rng = pd.date_range(datetime.now(), periods=365, freq=BDay())\n",
+					"  rng = pd.date_range(datetime.now(), periods=365, freq='D')\n",
+					"  #rng = pd.date_range(end, periods=p, freq='D')\n",
+					"\n",
+					"  future_pd = pd.DataFrame({ 'Date': rng})\n",
+					"  future_pd['Date'] = future_pd['Date'].dt.date\n",
+					"\n",
+					"  #forecast_pd = pd.DataFrame({ 'Date': rng})\n",
+					"\n",
+					"  # future = m.make_future_dataframe(periods=365,freq = '1d')\n",
+					"  automl_prediction = fitted_model.predict(forecast_pd)\n",
+					"  #automl_prediction\n",
+					"  forecast_pd['yhat'] = automl_prediction.tolist()\n",
+					"\n",
+					"  automl_futureprediction = fitted_model.predict(future_pd)\n",
+					"  future_pd['yhat'] = automl_futureprediction.tolist()\n",
+					"\n",
+					"  df_train = tabular.to_pandas_dataframe(on_error='null', out_of_range_datetime='null')\n",
+					"  df_train = df_train[['Date','AdjClose']]\n",
+					"  df_train.columns = ['Date','actual']\n",
+					"  act_forecast = df_train.merge(forecast_pd[['Date','yhat']],on='Date',how='outer')\n",
+					"  act_forecast = act_forecast.append(future_pd[['Date','yhat']])\n",
+					"\n",
+					"  act_forecast['portfolio'] = portfolio\n",
+					"  act_forecast['sector'] = sector\n",
+					"  act_forecast['ticker'] = ticker\n",
+					"\n",
+					"  act_forecast['future_predicted'] = np.nan\n",
+					"  mask = (act_forecast['actual'].isnull())\n",
+					"  act_forecast['future_predicted'][mask] = act_forecast['yhat']\n",
+					"  act_forecast['yhat'][mask] = np.nan\n",
+					"\n",
+					"  act_forecast['timegran'] = timevar\n",
+					"  act_forecast['itemgran'] = 'store_item'\n",
+					"\n",
+					"  act_forecast.shape\n",
+					"  #print(act_forecast.head(4))\n",
+					"  act_forecast = act_forecast[['Date','portfolio','sector','ticker','actual','yhat','future_predicted','timegran','itemgran']]\n",
+					"  act_forecast.columns = ['Date','portfolio','sector','ticker','actual','predicted','future_predicted','timegran','itemgran']\n",
+					"  #act_forecast.columns = ['ds','store','item','sales','forecast','future_forecast','timegran','itemgran']\n",
+					"  return(act_forecast)"
+				],
+				"execution_count": 91
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"portfolioList = portfolioData.Ticker.tolist()\r\n",
+					"portfolioList"
+				],
+				"execution_count": 92
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"def run_forecast1(df1):\r\n",
+					"    display(df1)\r\n",
+					"    return df1"
+				],
+				"execution_count": 94
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"import pandas as pd\r\n",
+					"from joblib import Parallel, delayed\r\n",
+					"import multiprocessing\r\n",
+					"\r\n",
+					"def applyParallel(dfGrouped, func):\r\n",
+					"    retLst = Parallel(n_jobs=multiprocessing.cpu_count())(delayed(func)(group) for name, group in dfGrouped)\r\n",
+					"    return pd.concat(retLst)"
+				],
+				"execution_count": 97
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"result_columns = [\"Date\",\"portfolio\",\"sector\",\"ticker\",\"actual\",\"predicted\",\"future_predicted\",\"timegran\",\"itemgran\"]\r\n",
+					"alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']\r\n",
+					"df_result = pd.DataFrame(columns = result_columns)\r\n",
+					"\r\n",
+					"for i in alphaList:\r\n",
+					"  print(\"Processing data starting with \", i)\r\n",
+					"  f_result = pd.DataFrame(columns = result_columns)\r\n",
+					"  quotesFilterSdf = portfolioData[portfolioData['Ticker'].str.startswith(i)]#.sort_values('Ticker')\r\n",
+					"  applyParallel(quotesFilterSdf.groupby(quotesFilterSdf.Ticker), run_forecast1)\r\n",
+					"  #df_result = df_result.append(df_res)\r\n",
+					"  #print(df_result)\r\n",
+					"  #output = df_result.to_csv (index=False, header=True, encoding = \"utf-8\")\r\n",
+					"  #blobName = \"PortfolioQuotes/PortfolioForecast/\" + row.Ticker + \".csv\"\r\n",
+					"  #blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\r\n",
+					"  #blob.upload_blob(output)"
+				],
+				"execution_count": 98
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"result_columns = [\"Date\",\"portfolio\",\"sector\",\"ticker\",\"actual\",\"predicted\",\"future_predicted\",\"timegran\",\"itemgran\"]\r\n",
+					"alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']\r\n",
+					"df_result = pd.DataFrame(columns = result_columns)\r\n",
+					"\r\n",
+					"for i in alphaList:\r\n",
+					"  print(\"Processing data starting with \", i)\r\n",
+					"  f_result = pd.DataFrame(columns = result_columns)\r\n",
+					"  quotesFilterSdf = portfolioData[portfolioData['Ticker'].str.startswith(i)]#.sort_values('Ticker')\r\n",
+					"  quotesFilterSdf.apply(run_forecast1)\r\n",
+					"  #df_result = df_result.append(df_res)\r\n",
+					"  #print(df_result)\r\n",
+					"  #output = df_result.to_csv (index=False, header=True, encoding = \"utf-8\")\r\n",
+					"  #blobName = \"PortfolioQuotes/PortfolioForecast/\" + row.Ticker + \".csv\"\r\n",
+					"  #blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\r\n",
+					"  #blob.upload_blob(output)"
+				],
+				"execution_count": 60
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"result_columns = [\"Date\",\"portfolio\",\"sector\",\"ticker\",\"actual\",\"predicted\",\"future_predicted\",\"timegran\",\"itemgran\"]\n",
+					"for index, row in portfolioData.iterrows():\n",
+					"    df_result = pd.DataFrame(columns = result_columns)\n",
+					"    filePath = '/PortfolioQuotes/HistoricalData/' + row.Ticker + '.csv'\n",
+					"    df_res = run_forecast(filePath, row.Portfolio, row.Sector, row.Ticker, 'daily')\n",
+					"    df_result = df_result.append(df_res)\n",
+					"    output = df_result.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+					"    blobName = \"PortfolioQuotes/PortfolioForecast/\" + row.Ticker + \".csv\"\n",
+					"    blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+					"    blob.upload_blob(output)\n",
+					"    #break\n",
+					"#df_result.shape  \n",
+					"#df_result.to_csv('/dbfs/mnt/ncmriskstorage/StockPricesForecastAutoMLforecast.csv',index=False)"
+				],
+				"execution_count": 13
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

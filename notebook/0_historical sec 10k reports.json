@@ -1,0 +1,248 @@
+{
+	"name": "0_historical sec 10k reports",
+	"properties": {
+		"folder": {
+			"name": "Risk"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "fca4b6dd-b1bd-45ee-8d5c-66ecb32428e4"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"# Importing built-in libraries (no need to install these)\n",
+					"import re\n",
+					"import os\n",
+					"from time import gmtime, strftime\n",
+					"from datetime import datetime, timedelta\n",
+					"import unicodedata\n",
+					"\n",
+					"# Importing libraries you need to install\n",
+					"import pandas as pd\n",
+					"import numpy as np\n",
+					"from sklearn.metrics.pairwise import cosine_similarity\n",
+					"import requests\n",
+					"import bs4 as bs\n",
+					"from lxml import html\n",
+					"from tqdm import tqdm\n",
+					"\n",
+					"from ratelimit import limits, sleep_and_retry\n",
+					"from bs4 import BeautifulSoup\n",
+					"\n",
+					"import pprint"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"diagram": {
+						"activateDiagramType": 1,
+						"chartConfig": {
+							"category": "bar",
+							"keys": [
+								"Portfolio"
+							],
+							"values": [
+								"Portfolio"
+							],
+							"yLabel": "Portfolio",
+							"xLabel": "Portfolio",
+							"aggregation": "COUNT",
+							"aggByBackend": false
+						},
+						"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+						"isSummary": false,
+						"previewData": {
+							"filter": null
+						},
+						"isSql": false
+					}
+				},
+				"source": [
+					"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+					"    format='csv', \n",
+					"    sep=\",\",\n",
+					"    header=True)\n",
+					"\n",
+					"portfolioData = nqSdf.toPandas()\n",
+					"display(portfolioData)"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Common methods to define SEC API endpoint and Getting SEC Data based on the document type and CIK\n",
+					"class SecAPI(object):\n",
+					"    SecCallLimit = {'calls': 10, 'seconds': 1}\n",
+					"\n",
+					"    @staticmethod\n",
+					"    @sleep_and_retry\n",
+					"    # Dividing the call limit by half to avoid coming close to the limit\n",
+					"    @limits(calls=SecCallLimit['calls'] / 2, period=SecCallLimit['seconds'])\n",
+					"    def _call_sec(url):\n",
+					"        return requests.get(url)\n",
+					"\n",
+					"    def get(self, url):\n",
+					"        return self._call_sec(url).text\n",
+					"    \n",
+					"def GetSecData(cik, ticker, doc_type, start=0, count=60):\n",
+					"    rss_url = 'https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany' \\\n",
+					"        '&CIK={}&type={}&start={}&count={}&owner=exclude&output=atom' \\\n",
+					"        .format(cik, doc_type, start, count)\n",
+					"    sec_data = sec_api.get(rss_url)\n",
+					"    feed = BeautifulSoup(sec_data.encode('ascii'), 'xml').feed\n",
+					"    entries = [\n",
+					"        (\n",
+					"            entry.content.find('filing-href').getText(),\n",
+					"            entry.content.find('filing-type').getText(),\n",
+					"            entry.content.find('filing-date').getText(),\n",
+					"            cik,\n",
+					"            ticker)\n",
+					"        for entry in feed.find_all('entry', recursive=False)]\n",
+					"\n",
+					"    return entries"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"sec_api = SecAPI()"
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Get the URL and list of all reports for 10K \n",
+					"sec_data = {}\n",
+					"\n",
+					"for index, ticker in portfolioData.iterrows():\n",
+					"    sec_data[ticker['Ticker']] = GetSecData(ticker['CIK'], ticker['Ticker'], '10-K')\n",
+					"    "
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Define the path to save 10K and 10Q\n",
+					"path10K = 'SecReports/10K/'"
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from azure.storage.blob import (\n",
+					"    BlockBlobService\n",
+					")\n",
+					"\n",
+					"accountName = \"marketriskdl\"\n",
+					"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+					"containerName = \"risk\"\n",
+					"\n",
+					"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)"
+				],
+				"execution_count": 10
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Download all 10K Reports\n",
+					"import time\n",
+					"for ticker, data in sec_data.items():\n",
+					"    #raw_fillings_by_ticker[ticker] = {}\n",
+					"    for index_url, file_type, file_date, cik, tckr in tqdm(data, desc='Downloading {} Fillings'.format(ticker), unit='filling'):\n",
+					"        if (file_type == '10-K'):\n",
+					"            file_url = index_url.replace('-index.htm', '.txt').replace('.txtl', '.txt')       \n",
+					"            secData = sec_api.get(file_url)\n",
+					"            blobName = path10K + tckr + '/' + cik + '_' + file_date + '.txt'\n",
+					"            blobService.create_blob_from_text(containerName, blobName, secData)\n",
+					"            time.sleep(5)\n",
+					"            "
+				],
+				"execution_count": 11
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Get the URL and list of all reports for 10Q\n",
+					"sec_data = {}\n",
+					"\n",
+					"for index, ticker in tickerDataTop10.iterrows():\n",
+					"    sec_data[ticker['Nasdaq_Symbol']] = GetSecData(ticker['CIK'], ticker['Nasdaq_Symbol'], '10-Q')\n",
+					"    "
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Download all 10Q Reports\n",
+					"for ticker, data in sec_data.items():\n",
+					"    #raw_fillings_by_ticker[ticker] = {}\n",
+					"    for index_url, file_type, file_date, cik, tckr in tqdm(data, desc='Downloading {} Fillings'.format(ticker), unit='filling'):\n",
+					"        if (file_type == '10-Q'):\n",
+					"            file_url = index_url.replace('-index.htm', '.txt').replace('.txtl', '.txt')       \n",
+					"            #raw_fillings_by_ticker[ticker][file_date] = sec_api.get(file_url)\n",
+					"            secData = sec_api.get(file_url)\n",
+					"            blobName = path10Q + tckr + '/' + cik + '_' + file_date + '.txt'\n",
+					"            blobService.create_blob_from_text(containerName, blobName, secData)\n",
+					"            #os.makedirs(os.path.dirname(blobName), exist_ok=True)\n",
+					"            #html_file = open(fileName, 'w+')\n",
+					"            #html_file.write(secData)\n",
+					"            #html_file.close()\n",
+					"            "
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

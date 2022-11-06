@@ -1,0 +1,386 @@
+{
+	"name": "2_gdelt based esg",
+	"properties": {
+		"folder": {
+			"name": "Risk"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "ee3fb5ff-a33c-45b3-b6e2-cc534fd7029a"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_spark",
+				"display_name": "scala"
+			},
+			"language_info": {
+				"name": "scala"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"//\r\n",
+					"// Original Demo code used from \r\n",
+					"//  https://databricks.com/blog/2020/07/10/a-data-driven-approach-to-environmental-social-and-governance.html\r\n",
+					"//\r\n",
+					"// modified for simple ESG calculation and converted to Synapse notebook by Mark Leischner 2021-02-10\r\n",
+					"//\r\n",
+					"// NOTE: the databricks concept of rwa,silver,gold is used here.  Could be modified for more efficient file handling\r\n",
+					"//\r\n",
+					"// Demo uses Jan 2021 files already downloaded GDELT files\r\n",
+					"//     production version could download the updated files from GDELT project which are updated every 15 minutes\r\n",
+					"//\r\n",
+					"//  From GDELT data defintion\r\n",
+					"//     Tone.  This is the average “tone” of all documents containing one or more mentions of thisnameset.    \r\n",
+					"//            The  score  ranges  from -100  (extremely  negative)  to  +100  (extremely positive).  \r\n",
+					"//            Common values range between -10 and +10, with 0 indicating neutral.  This is calculated  as \r\n",
+					"//            Positive  Score  minus  Negative  Score.    Note  that  both  Positive  Score  and Negative  Score \r\n",
+					"//            are available  separately  below  as  well.    A  document  with  a  Tone  score close to zero may either\r\n",
+					"//            have low emotional response or may have a Positive Score and Negative  Score  that  are  roughly  equivalent  \r\n",
+					"//            to  each  other,  such  that  they  nullify  each other.    These  situations  can  be  detected  either  through\r\n",
+					"//            looking  directly  at the Positive Score and Negative Scorevariablesor through the Polarity variable.\r\n",
+					"//\r\n",
+					"// Further Notes:\r\n",
+					"// The ESG score created in this demo code employs a simple average calculation over the GDELT input data csv files.\r\n",
+					"//   The GDELT files take news articles and creates a theme for each article and a tone for the article.  \r\n",
+					"//   Usual tone scores range is from -10 to 10, with 0 being neutral, above 0 a positive, and below 0 a negative.\r\n",
+					"//   The final result score file contains Ticker, ESGType, ESGScore.  Each ticker can have up to three scores, \r\n",
+					"//   one for E - Economy, S - Social, and G - Corporate Governance.   \r\n",
+					"//\r\n",
+					"// Future development options are to split up the information into more specifc category buckets and \r\n",
+					"//   give weights to each bucket.  With these numbers and weights, you could generate an overall ESG score per company.\r\n",
+					"//\r\n",
+					""
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"import org.apache.spark.sql.types._\r\n",
+					"import org.apache.spark.sql.functions._\r\n",
+					"\r\n",
+					"val schemadf1 = (new StructType()).add(\"globalEventID\",StringType,true).add(\"pDate\",StringType).add(\"_c02\",StringType).add(\"_c03\",StringType).add(\"documentIdentifier\",StringType).add(\"_c05\",StringType).add(\"_c06\",StringType).add(\"themesStr\",StringType).add(\"_c08\",StringType).add(\"_c09\",StringType).add(\"_c10\",StringType).add(\"_c11\",StringType).add(\"_c12\",StringType).add(\"organisationsStr\",StringType).add(\"_c14\",StringType).add(\"tones\",StringType).add(\"_c16\",StringType).add(\"_c17\",StringType).add(\"_c18\",StringType).add(\"_c19\",StringType).add(\"_c20\",StringType).add(\"_c21\",StringType).add(\"_c22\",StringType).add(\"_c23\",StringType).add(\"_c24\",StringType).add(\"_c25\",StringType).add(\"_c26\",StringType)\r\n",
+					"\r\n",
+					"val df1 = spark.read.format(\"csv\").options(Map(\"delimiter\"->\"\\t\")).schema(schemadf1).load(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/2021/01/*.csv\")\r\n",
+					"\r\n",
+					"val gdf1 = df1.select(\r\n",
+					"  col(\"globalEventID\"), \r\n",
+					"  (substring(col(\"pDate\"), 0, 8)).as(\"publishDate\"),\r\n",
+					"  col(\"_c02\"), col(\"_c03\"),\r\n",
+					"  col(\"documentIdentifier\"),\r\n",
+					"  col(\"_c05\"), col(\"_c06\"),\r\n",
+					"  split(col(\"themesStr\"),\";\").as(\"themesStr\").as(\"themes\"),\r\n",
+					"  col(\"_c08\"), col(\"_c09\"), col(\"_c10\"), col(\"_c11\"), col(\"_c12\"),\r\n",
+					"  split(col(\"organisationsStr\"),\";\").as(\"organisations\"),\r\n",
+					"  col(\"_c14\"),\r\n",
+					"  substring_index(col(\"tones\"), \",\", 1).as(\"tone\"),\r\n",
+					"  col(\"_c16\"), col(\"_c17\"), col(\"_c18\"), col(\"_c19\"), col(\"_c20\"), col(\"_c21\"), col(\"_c22\"), col(\"_c23\"), col(\"_c24\"), col(\"_c25\"), col(\"_c26\"))\r\n",
+					"\r\n",
+					"//gdf1.show()\r\n",
+					""
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"val gdf2 = df1.select(\r\n",
+					"  col(\"globalEventID\"), \r\n",
+					"  (substring(col(\"pDate\"), 0, 8)).as(\"publishDate\"),\r\n",
+					"  col(\"documentIdentifier\"),\r\n",
+					"  col(\"themesStr\"),\r\n",
+					"  col(\"organisationsStr\"),\r\n",
+					"  substring_index(col(\"tones\"), \",\", 1).as(\"tone\")\r\n",
+					"  )\r\n",
+					"\r\n",
+					"val gdfECON = gdf2.withColumn(\"containsECON\", col(\"themesStr\").rlike(\"ECON_\"))\r\n",
+					"val gdfENV = gdfECON.withColumn(\"containsENV\", col(\"themesStr\").rlike(\"ENV_\"))\r\n",
+					"val gdfUNGP = gdfENV.withColumn(\"containsUNGP\", col(\"themesStr\").rlike(\"UNGP_\"))\r\n",
+					"\r\n",
+					"//gdfUNGP.show()\r\n",
+					""
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"gdfUNGP.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt.csv\")\r\n",
+					""
+				],
+				"execution_count": 4
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"val gdelt_silver_df = (gdfUNGP.select(\r\n",
+					"  col(\"globalEventID\"), \r\n",
+					"  col(\"publishDate\"),\r\n",
+					"  col(\"documentIdentifier\").as(\"url\"),\r\n",
+					"  expr(\"case when containsECON then 'ECON' when containsENV then 'ENV' when containsUNGP then 'UNGP' else 'OTHER' end\").as(\"theme\"),\r\n",
+					"  col(\"organisationsStr\").as(\"organisations\"),\r\n",
+					"  col(\"tone\")\r\n",
+					"  )).filter(\"theme not like 'OTHER'\")\r\n",
+					"\r\n",
+					"//gdelt_silver_df.show()\r\n",
+					"\r\n",
+					"gdelt_silver_df.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_silver.csv\")\r\n",
+					"\r\n",
+					"gdelt_silver_df.createOrReplaceTempView(\"gdelt_silver\");\r\n",
+					""
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"import org.apache.spark.sql.types._\r\n",
+					"import org.apache.spark.sql.functions._\r\n",
+					"\r\n",
+					"val schemaport = (new StructType()).add(\"Ticker\",StringType).add(\"TickerName\",StringType)\r\n",
+					"\r\n",
+					"val portfoliodf = spark.read.format(\"csv\").options(Map(\"delimiter\"->\",\")).schema(schemaport).load(\"abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioName.csv\")\r\n",
+					"\r\n",
+					"//portfoliodf.show()\r\n",
+					""
+				],
+				"execution_count": 6
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"val tlist = portfoliodf.select(\"TickerName\").map(r => r.getString(0)).collect().toList\r\n",
+					"\r\n",
+					"for (tname <- tlist) {\r\n",
+					"\r\n",
+					"     val tempdf = gdelt_silver_df.select( \r\n",
+					"     col(\"globalEventID\"), \r\n",
+					"     col(\"publishDate\"),\r\n",
+					"     col(\"url\"),\r\n",
+					"     col(\"theme\"),\r\n",
+					"     lit(tname.toLowerCase()).as(\"organisation\"),\r\n",
+					"     col(\"tone\")\r\n",
+					"     ).filter(\"organisations like '%\" + tname.toLowerCase() + \"%'\")\r\n",
+					"\r\n",
+					"    tempdf.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/myportfolio/\" + tname + \"/gdelt_gold.csv\")\r\n",
+					"\r\n",
+					"   }"
+				],
+				"execution_count": 7
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "python"
+					},
+					"collapsed": true
+				},
+				"source": [
+					"%%pyspark\r\n",
+					"from pyspark.sql import functions as F\r\n",
+					"from pyspark.sql import types \r\n",
+					"\r\n",
+					"esg_gold = spark.read.option(\"header\", \"true\").format(\"csv\").load(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/myportfolio/*/gdelt_gold.csv/*.csv\").groupBy(\"organisation\",\"theme\").agg( F.sum(\"tone\").alias(\"tone\"), F.count(\"tone\").alias(\"total\") ).select(\"theme\", \"organisation\", \"tone\", \"total\").withColumn(\"avg\", F.col(\"tone\")/F.col(\"total\"))\r\n",
+					"\r\n",
+					"esg_gold.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_gold_avg.csv\")\r\n",
+					""
+				],
+				"execution_count": 8
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					"val esg_scores = (spark.read.option(\"header\", \"true\").format(\"csv\").load(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_gold_avg.csv/*.csv\")).withcolumn(\"TickerName\", col(\"oragnisation\"))\r\n",
+					"\r\n",
+					"val esg_results = portfoliodf.join(esg_scores, \"TickerName\").withColumn(\"ESGType\", when(col(\"theme\") === \"ECON\", \"E\").when(col(\"theme\") === \"ENV\", \"S\").when(col(\"theme\") === \"UNGP\", \"G\")  ).withColumn(\"ESGScore\",col(\"avg\")).select(\"Ticker\", \"ESGType\", \"ESGScore\")\r\n",
+					"\r\n",
+					"esg_results.repartition(1).write.mode(\"overwrite\").format(\"csv\").option(\"header\", \"true\").csv(\"abfss://risk@marketriskdl.dfs.core.windows.net/GDELT/mydb/gdelt_results.csv\")\r\n",
+					"\r\n",
+					"esg_results.show\r\n",
+					""
+				],
+				"execution_count": 9
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"collapsed": true
+				},
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

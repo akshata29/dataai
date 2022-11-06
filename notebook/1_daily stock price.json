@@ -1,0 +1,157 @@
+{
+	"name": "1_daily stock price",
+	"properties": {
+		"folder": {
+			"name": "Risk"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "f2110779-c8f7-4a2d-a74e-b1ffda1cfd83"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"#Import the required libraries\n",
+					"import pandas as pd\n",
+					"import yfinance as yf\n",
+					"#from yahoofinancials import YahooFinancials\n",
+					"from datetime import datetime"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"diagram": {
+						"activateDiagramType": 1,
+						"chartConfig": {
+							"category": "bar",
+							"keys": [
+								"Portfolio"
+							],
+							"values": [
+								"Portfolio"
+							],
+							"yLabel": "Portfolio",
+							"xLabel": "Portfolio",
+							"aggregation": "COUNT",
+							"aggByBackend": false
+						},
+						"aggData": "{\"Portfolio\":{\"Covid\":15,\"LongTerm\":9}}",
+						"isSummary": false,
+						"previewData": {
+							"filter": null
+						},
+						"isSql": false
+					}
+				},
+				"source": [
+					"# Read out CSV file with list of all tickers\n",
+					"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Portfolio/PortfolioCik.csv', \n",
+					"    format='csv', \n",
+					"    sep=\",\",\n",
+					"    header=True)\n",
+					"\n",
+					"portfolioData = nqSdf.toPandas()\n",
+					"display(portfolioData)"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from azure.storage.blob import BlobServiceClient, ContainerClient\n",
+					"from azure.storage.blob import BlobClient\n",
+					"\n",
+					"accountName = \"marketriskdl\"\n",
+					"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+					"containerName = \"risk\"\n",
+					"connectionString = \"DefaultEndpointsProtocol=https;AccountName=marketriskdl;AccountKey=2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==;EndpointSuffix=core.windows.net\""
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"# Get the stock price for all tickers and write it to CSV file\n",
+					"#yahoo_financials = YahooFinancials(tickerTop10)\n",
+					"\n",
+					"#data = yahoo_financials.get_historical_price_data(start_date='2019-01-01', \n",
+					"#                                                  end_date='2019-01-31', \n",
+					"#                                                  time_interval='daily')\n",
+					"import datetime\n",
+					"\n",
+					"finalColNames = [\"Portfolio\", \"Sector\", \"Cik\", \"Date\", \"Ticker\", \"AdjClose\"]\n",
+					"\n",
+					"for index, ticker in portfolioData.iterrows():\n",
+					"    finalDf = pd.DataFrame(columns = finalColNames)\n",
+					"    #stockData = yf.download(ticker['Ticker'], start='1994-01-01', end='2020-03-31', time_interval='daily', progress=True)\n",
+					"    #stockData = yf.download(ticker['Ticker'], start='2020-10-20', end='2020-10-21', time_interval='daily', progress=True)\n",
+					"    stockData = yf.Ticker(ticker['Ticker']).history(period=\"1d\", interval=\"1d\").tail(1)\n",
+					"    totalRows = len(stockData.index)\n",
+					"    if (totalRows > 0):\n",
+					"        for index, row in stockData.iterrows():\n",
+					"            finalDf = finalDf.append({'Portfolio' : str(ticker['Portfolio']), 'Sector' : ticker['Sector'], 'Cik' : ticker['CIK'], 'Date' : index.date() , 'Ticker' : ticker['Ticker'], 'AdjClose' : row['Close'] } , ignore_index=True)\n",
+					"            date = datetime.datetime.strptime(str(index.date()), \"%Y-%m-%d\")\n",
+					"        output = finalDf.to_csv (index=False, header=True, encoding = \"utf-8\")\n",
+					"        blobName = \"PortfolioQuotes/DailyData/\" + str(date.year) + \"/\" + str(date.month) + \"/\" + str(date.day) + \"/\" + ticker['Ticker'] + \".csv\"\n",
+					"        blob = BlobClient.from_connection_string(conn_str=connectionString, container_name=containerName, blob_name=blobName)\n",
+					"        blob.upload_blob(output)\n",
+					"\n",
+					""
+				],
+				"execution_count": 37
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}

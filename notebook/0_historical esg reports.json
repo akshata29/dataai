@@ -1,0 +1,138 @@
+{
+	"name": "0_historical esg reports",
+	"properties": {
+		"folder": {
+			"name": "Risk"
+		},
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "dataaispk",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "7b24a2e3-037c-42c2-ad3d-3e411481c101"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+				"name": "dataaispk",
+				"type": "Spark",
+				"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.2",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"import requests"
+				],
+				"execution_count": 1
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"diagram": {
+						"activateDiagramType": 1,
+						"chartConfig": {
+							"category": "bar",
+							"keys": [
+								"Company"
+							],
+							"values": [
+								"Company"
+							],
+							"yLabel": "Company",
+							"xLabel": "Company",
+							"aggregation": "COUNT",
+							"aggByBackend": false
+						},
+						"aggData": "{\"Company\":{\"aberdeen standard\":1,\"abri capital\":1,\"apollo\":1,\"bank of america\":1,\"barclays\":1,\"bluebay\":1,\"bmogan\":1,\"cerberus\":1,\"cinven\":1,\"citi\":1,\"coller capital\":1,\"credit suisse\":1,\"exponent\":1,\"goldman sachs\":1,\"hermes investments\":1,\"hsbc\":1,\"jp morgan chase\":1,\"kkr\":1,\"lasalle\":1,\"lazard\":1,\"lloyds\":1,\"macquarie\":1,\"morgan stanley\":1,\"northern trust\":1,\"rbc\":1,\"riverstone\":1,\"ruffer\":1,\"santander\":1,\"schroders\":1,\"silverfleet capital\":1,\"standard chartered\":1,\"td bank\":1,\"vanguard\":1,\"warburg pircus\":1}}",
+						"isSummary": false,
+						"previewData": {
+							"filter": null
+						},
+						"isSql": false
+					}
+				},
+				"source": [
+					"nqSdf = spark.read.load('abfss://risk@marketriskdl.dfs.core.windows.net/Esg/Esg.csv', \n",
+					"    format='csv', \n",
+					"    sep=\",\",\n",
+					"    header=True)\n",
+					"\n",
+					"EsgData = nqSdf.toPandas()\n",
+					"display(EsgData)"
+				],
+				"execution_count": 2
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from azure.storage.blob import (\n",
+					"    BlockBlobService\n",
+					")\n",
+					"\n",
+					"accountName = \"marketriskdl\"\n",
+					"accountKey = \"2Gsb+co0ZjMiaiJxBHAPMhRyvY0NDz08r4WA2mDVgBd7RHcbykI+wUCYkIW9blVE/hnNXm+Z+mOzkppHi4BTag==\"\n",
+					"containerName = \"risk\"\n",
+					"\n",
+					"blobService = BlockBlobService(account_name=accountName, account_key=accountKey)"
+				],
+				"execution_count": 3
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					"from urllib.parse import urlparse\n",
+					"from pathlib import Path\n",
+					"\n",
+					"for index, esg in EsgData.iterrows():\n",
+					"    url = esg['Url']\n",
+					"    r = requests.get(url, allow_redirects=True)\n",
+					"    a = urlparse(url)\n",
+					"    blobName = 'EsgReports/' + Path(a.path).name\n",
+					"    blobService.create_blob_from_text(containerName, blobName, r.content)\n",
+					""
+				],
+				"execution_count": 5
+			},
+			{
+				"cell_type": "code",
+				"source": [
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
