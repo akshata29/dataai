@@ -23,6 +23,9 @@
 		"dataainsmidw_connectionString": {
 			"value": ""
 		},
+		"dataaisql_connectionString": {
+			"value": ""
+		},
 		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
