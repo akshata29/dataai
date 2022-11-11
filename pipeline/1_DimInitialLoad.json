@@ -1,0 +1,82 @@
+{
+	"name": "1_DimInitialLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "getFiles",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "advwksraw",
+						"type": "DatasetReference",
+						"parameters": {
+							"folderPath": "wwi/customers",
+							"fileName": "/"
+						}
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			},
+			{
+				"name": "initialLoad",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "getFiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "1_DimInitialLoad",
+						"type": "DataFlowReference",
+						"parameters": {
+							"fileName": {
+								"value": "'@{activity('getFiles').output.childItems[0].name}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "dataaiir",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "AdventureWorks"
+		},
+		"annotations": []
+	}
+}
