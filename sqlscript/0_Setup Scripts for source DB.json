@@ -1,0 +1,20 @@
+{
+	"name": "0_Setup Scripts for source DB",
+	"properties": {
+		"folder": {
+			"name": "Lakehouse"
+		},
+		"content": {
+			"query": "-- Run following setup script on source Database to create tables and enable CDC\n\n-- To create the source table, copy and paste the code snippet below and click Run\nCREATE TABLE Customers (\n    CustomerID int IDENTITY(1,1) PRIMARY KEY,\n    CustomerAddress varchar(255) NOT NULL\n);\n\n\n-- To enable change data capture on the source table, copy and paste the code snippet below and click Run\nEXEC sys.sp_cdc_enable_db;\nEXEC sys.sp_cdc_enable_table  \n    @source_schema = N'dbo',  \n    @source_name   = N'Customers',  \n    @role_name     = NULL,\n    @supports_net_changes = 1;\n\n\n-- To load the source table with data, copy and paste the code snippet below and click Run\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('82 Margate Drive, Sheffield S4 8FQ'),\n    ('135 High Barns, Ely, CB7 4RH'),\n    ('39 Queen Annes Drive, Bedale, DL8 2EL');\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

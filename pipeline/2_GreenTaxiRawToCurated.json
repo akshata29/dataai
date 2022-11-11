@@ -156,7 +156,7 @@
 			}
 		],
 		"folder": {
-			"name": "NycTaxi/2_RawToCurated"
+			"name": "NycTaxi/02_RawToCurated"
 		},
 		"annotations": [],
 		"lastPublishTime": "2022-08-25T18:39:43Z"

@@ -1,0 +1,139 @@
+{
+	"name": "0_IncrementalCustomerCdc",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetChangeCount",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('DECLARE @begin_time datetime, @end_time datetime, @from_lsn binary(10), @to_lsn binary(10); \nSET @begin_time = ''',pipeline().parameters.triggerStartTime,''';\nSET @end_time = ''',pipeline().parameters.triggerEndTime,''';\nSET @from_lsn = sys.fn_cdc_map_time_to_lsn(''smallest greater than or equal'', @begin_time);\nSET @to_lsn = sys.fn_cdc_map_time_to_lsn(''largest less than'', @end_time);\nIF (@from_lsn IS NOT NULL AND @to_lsn IS NOT NULL AND @from_lsn < @to_lsn)\nSELECT count(1) changecount FROM cdc.fn_cdc_get_net_changes_dbo_Customers(@from_lsn, @to_lsn, ''all'')\nELSE SELECT 0 changecount')",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "0_dataaisql",
+						"type": "DatasetReference",
+						"parameters": {
+							"schema": "cdc",
+							"table": "dbo_Customer_LT"
+						}
+					}
+				}
+			},
+			{
+				"name": "HasChangedRows",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "GetChangeCount",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(int(activity('GetChangeCount').output.firstRow.changecount),0)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "copyIncrementalData",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat('DECLARE @begin_time datetime, @end_time datetime, @from_lsn binary(10), @to_lsn binary(10); \nSET @begin_time = ''',pipeline().parameters.triggerStartTime,''';\nSET @end_time = ''',pipeline().parameters.triggerEndTime,''';\nSET @from_lsn = sys.fn_cdc_map_time_to_lsn(''smallest greater than or equal'', @begin_time);\nSET @to_lsn = sys.fn_cdc_map_time_to_lsn(''largest less than'', @end_time);\nSELECT CustomerID, CustomerAddress FROM cdc.fn_cdc_get_net_changes_dbo_Customers(@from_lsn, @to_lsn, ''all'')')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "0_dataaisql",
+									"type": "DatasetReference",
+									"parameters": {
+										"schema": "cdc",
+										"table": "dbo_Customers_CT"
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "0_advwksraw",
+									"type": "DatasetReference",
+									"parameters": {
+										"folderPath": "wwi/customers",
+										"fileName": {
+											"value": "@concat(formatDateTime(pipeline().parameters.triggerStartTime,'yyyyMMddHHmmssfff'),'.csv')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"triggerStartTime": {
+				"type": "string"
+			},
+			"triggerEndTime": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Lakehouse"
+		},
+		"annotations": []
+	}
+}
