@@ -1,5 +1,5 @@
 {
-	"name": "0_advwksraw",
+	"name": "advwksraw",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dataairawdls",

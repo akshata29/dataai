@@ -25,7 +25,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "0_dataaisql",
+						"referenceName": "dataaisql",
 						"type": "DatasetReference",
 						"parameters": {
 							"schema": "cdc",
@@ -97,7 +97,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "0_dataaisql",
+									"referenceName": "dataaisql",
 									"type": "DatasetReference",
 									"parameters": {
 										"schema": "cdc",
@@ -107,7 +107,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "0_advwksraw",
+									"referenceName": "advwksraw",
 									"type": "DatasetReference",
 									"parameters": {
 										"folderPath": "wwi/customers",

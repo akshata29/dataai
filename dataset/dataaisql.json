@@ -1,5 +1,5 @@
 {
-	"name": "0_dataaisql",
+	"name": "dataaisql",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "dataaisql",
