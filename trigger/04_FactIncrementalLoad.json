@@ -1,0 +1,25 @@
+{
+	"name": "04_FactIncrementalLoad",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "4_FactIncrementalLoad",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/advwks/blobs/raw/wwi/orders",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
