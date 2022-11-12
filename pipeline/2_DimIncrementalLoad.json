@@ -1,0 +1,46 @@
+{
+	"name": "2_DimIncrementalLoad",
+	"properties": {
+		"activities": [
+			{
+				"name": "incrementalLoad",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "2_DimIncrementalLoad",
+						"type": "DataFlowReference",
+						"parameters": {
+							"fileName": {
+								"value": "'@{pipeline().parameters.fileName}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"integrationRuntime": {
+						"referenceName": "dataaiir",
+						"type": "IntegrationRuntimeReference"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"fileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Lakehouse"
+		},
+		"annotations": []
+	}
+}
