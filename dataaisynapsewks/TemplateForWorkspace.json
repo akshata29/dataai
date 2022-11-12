@@ -91,6 +91,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'sasUri' of 'nyc_tlc_yellow'"
 		},
+		"04_FactIncrementalLoad_properties_4_FactIncrementalLoad_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.body.fileName"
+		},
+		"04_FactIncrementalLoad_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
+		},
 		"0_IncrementalCustomerCdc_properties_pipeline_parameters_triggerStartTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(trigger().outputs.windowStartTime,'yyyy-MM-dd HH:mm:ss.fff')"
@@ -104,14 +112,6 @@
 			"defaultValue": "@trigger().outputs.body.fileName"
 		},
 		"2_DimIncrementalLoad_properties_typeProperties_scope": {
-			"type": "string",
-			"defaultValue": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
-		},
-		"04_FactIncrementalLoad_properties_4_FactIncrementalLoad_parameters_fileName": {
-			"type": "string",
-			"defaultValue": "@trigger().outputs.body.fileName"
-		},
-		"04_FactIncrementalLoad_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
 		}
@@ -10574,6 +10574,39 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/04_FactIncrementalLoad')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "4_FactIncrementalLoad",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"fileName": "[parameters('04_FactIncrementalLoad_properties_4_FactIncrementalLoad_parameters_fileName')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/advwks/blobs/raw/wwi/orders",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('04_FactIncrementalLoad_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/4_FactIncrementalLoad')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/0_IncrementalCustomerCdc')]",
 			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
@@ -10637,6 +10670,35 @@
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/pipelines/2_DimIncrementalLoad')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/3_IncrementalOrdersWatermark')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "3_IncrementalOrdersWatermark",
+						"type": "PipelineReference"
+					},
+					"parameters": {}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Minute",
+					"interval": 5,
+					"startTime": "2022-11-12T02:48:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 50,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
@@ -16948,7 +17010,7 @@
 					"name": "Lakehouse"
 				},
 				"content": {
-					"query": "-- https://github.com/tayganr/lakehouse\n\nData Lakehouse\n\nThe data lakehouse is a data architecture pattern that combines functional aspects of the data warehouse, with the data lake, on one platform. \nThis will walk through an example of how the data lakehouse pattern can be facilitated in Azure with Azure Synapse Analytics.\n\nOLTP (SQL) -> Synapse Pipeline -> Data Lake (Raw, Enriched - Delta, Curated - Delta) -> Serverless SQL -> Power BI\n\nStep 1 (0_IncrementalCustomerCdc)\n=================================\nSynapse Pipeline to incrementally copy data from an OLTP source (Azure SQL Database) to a Data Lake (Azure Data Lake Storage Gen2), leveraging Change Data Capture \ntechnology to isolate changes.\n\nAzure SQL DB(CDC Enabled) -> ChangeCount -> Lookup Activity -> If Condition Check -> Copy Data Activity -> Raw Data Lake\n\n\t* The pipeline will perform an initial check to see if any changes (new records or modifications to existing records) exist in the source system since the last load.\n\t* If there are changes, the new data will be copied to the raw layer of the Data Lake.\n\nDynamic Content for Lookup & Copy Activity\n------------------------------------------\nAt runtime, the pipeline will pass parameters triggerStartTime and triggerEndTime to the @concat function which will result in a SQL statement.\n\nThe query performs the following high-level steps:\n\n* DECLARE variables (@begin_time, @end_time, @from_lsn, and @to_lsn)\n* SET the variable values\n* Calculates the number of net changes within the given time period\n\nThe query is able to achieve this by leveraging CDC functions such as:\n\n* sys.fn_cdc_map_time_to_lsn which returns a log sequence number (LSN) for a given datetime\n* cdc.fn_cdc_get_net_changes_<capture_instance> which returns the net changes for a specified LSN range.\n\nStep 2 (1_DimInitialLoad)\n=========================\nSynapse Pipeline to load data from our raw layer (CSV), into our curated layer (Delta Lake).\n\nRaw Data Lake -> Get Metadata of files -> DataFlow for Initial Load (DataFlow = Source Data -> Surrogate Key -> Derived Column -> Select Column -> \nCurated Customer in Delta Lake format)\n\nStep 3(1_DimIncrementalLoad) (SCD Type 2)\n==========================================\nSynapse Pipeline to incrementally load data from our raw layer (CSV), into our curated layer (Delta Lake) as a SCD Type 2 dimension table.\n\nData Flow Sequence\n1- New customer data (rawCustomer)\n2- Existing customer data (dimCustomer)\n3- Filtered existing customer data (activeCustomer)\n4- Identify net new customers (newRecords)\n5- Identify existing customers (existingRecords)\n6- Add hash fingerprint to existing customers from new data (addHash)\n7- Add hash fingerprint to existing customers from existing data (addHashDim)\n8- Identify existing customers with changed values (changedRecords)\n9- Union newRecords and changedRecords (unionNewActive)\n10- Mark these rows as INSERT (markAsInsert)\n11- Add an incremental key (addTempKey)\n12- Calculate current maximum surrogate key from existing data (maxSurrogateKey)\n13- Join two data streams addTempKey and maxSurrogateKey (joinMaxSurrogateKey)\n14- Set value for SCD columns such as CustomerSK, IsActive, ValidFrom, ValidTo (scdColumns)\n15- Drop temporary columns such as Hash, TempKey, and MaxCustomerSK (dropTempColumns)\n16- Identify obsolete customer records (obsoleteRecords)\n17- Mark these rows as UPDATE (markAsUpdate)\n18- Set value for SCD columns such as IsActive and ValidTo (scdColumnsObsolete)\n19- Drop the temporary column Hash (dropTempColumns2)\n20- Union the two streams (unionResults)\n21- Write the results into the Delta Lake (sinkCustomer)\n\nStep 4 (Automation using Triggers)\n===================================\nPeriodically copy changes from source using a Tumbling Window trigger.\nOn the arrival of new files in the data lake, incrementally load the dimension table using a Storage Event trigger.\n\nTumbling window triggers are a type of trigger that fire at a periodic time interval. In this step, a new tumbling window trigger will be associated with \nthe pipeline from step 1. The trigger will be set to run every 5 minutes and pass trigger outputs (windowStartTime and windowEndTime) to the corresponding \npipeline parameters (triggerStartTime and triggerEndTime).\n\nStorage event triggers are a type of trigger that fire when certain types of storage events occur (e.g. Blob created or Blob deleted ). In this step, \na new storage event trigger will be associated with the pipeline from Step 3. The trigger will be set to fire whenever a Blob created event occurs \nwithin the wwi/customers directory for blob paths that end in .csv. Trigger output @trigger().outputs.body.fileName will be passed to the pipeline parameter fileName.\n\nLoad additional data into customers\n-----------------------------------\nIn this step, execute SQL code within the Azure SQL Database (source system) against the target table dbo.Customers. The code will make changes to \nexisting customer records (UPDATE), as well as the addition of net new customer records (INSERT).\n\nUPDATE dbo.Customers SET CustomerAddress = '34 Park Road, East London, E9 7RW' WHERE CustomerID = 5;\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('169 Manchester Road, Preston, PR35 8AQ'),\n    ('52 Broadway, Plymouth, PL39 3PY');\nSELECT * FROM [dbo].[Customers];\n\nSince our pipelines are being automatically executed based on triggers, the data changes applied in the previous step will result in data automatically \nflowing from source (Azure SQL Database) to destination (Azure Data Lake Storage Gen2), then subsequently transformed before finally being loaded in the \nDelta Lake table format.\n\nThe tumbling window trigger will execute Step 1 Pipeline every 5 minutes.\nIf changes are detected, data is copied to ADLS Gen 2 (raw).\nUpon the detection of a new CSV file, the storage event trigger will execute Step 3 Pipeline\nThe pipeline will cross-check the raw data (CSV) against the existing curated data (Delta Lake) and UPSERT the new data adhering to the SCD Type 2 pattern.\n\nServerless SQL pool is a query service that comes with every Azure Synapse Analytics workspace. Serverless SQL pool enables you to query files such as \nParquet, Delta Lake, and delimited text formats, from the Azure Data Lake, without the need to copy or load data into a specialized store.\n\n",
+					"query": "-- https://github.com/tayganr/lakehouse\n\nData Lakehouse\n\nThe data lakehouse is a data architecture pattern that combines functional aspects of the data warehouse, with the data lake, on one platform. \nThis will walk through an example of how the data lakehouse pattern can be facilitated in Azure with Azure Synapse Analytics.\n\nOLTP (SQL) -> Synapse Pipeline -> Data Lake (Raw, Enriched - Delta, Curated - Delta) -> Serverless SQL -> Power BI\n\nStep 1 (0_IncrementalCustomerCdc)\n=================================\nSynapse Pipeline to incrementally copy data from an OLTP source (Azure SQL Database) to a Data Lake (Azure Data Lake Storage Gen2), leveraging Change Data Capture \ntechnology to isolate changes.\n\nAzure SQL DB(CDC Enabled) -> ChangeCount -> Lookup Activity -> If Condition Check -> Copy Data Activity -> Raw Data Lake\n\n\t* The pipeline will perform an initial check to see if any changes (new records or modifications to existing records) exist in the source system since the last load.\n\t* If there are changes, the new data will be copied to the raw layer of the Data Lake.\n\nDynamic Content for Lookup & Copy Activity\n------------------------------------------\nAt runtime, the pipeline will pass parameters triggerStartTime and triggerEndTime to the @concat function which will result in a SQL statement.\n\nThe query performs the following high-level steps:\n\n* DECLARE variables (@begin_time, @end_time, @from_lsn, and @to_lsn)\n* SET the variable values\n* Calculates the number of net changes within the given time period\n\nThe query is able to achieve this by leveraging CDC functions such as:\n\n* sys.fn_cdc_map_time_to_lsn which returns a log sequence number (LSN) for a given datetime\n* cdc.fn_cdc_get_net_changes_<capture_instance> which returns the net changes for a specified LSN range.\n\nStep 2 (1_DimInitialLoad)\n=========================\nSynapse Pipeline to load data from our raw layer (CSV), into our curated layer (Delta Lake).\n\nRaw Data Lake -> Get Metadata of files -> DataFlow for Initial Load (DataFlow = Source Data -> Surrogate Key -> Derived Column -> Select Column -> \nCurated Customer in Delta Lake format)\n\nStep 3(1_DimIncrementalLoad) (SCD Type 2)\n==========================================\nSynapse Pipeline to incrementally load data from our raw layer (CSV), into our curated layer (Delta Lake) as a SCD Type 2 dimension table.\n\nData Flow Sequence\n1- New customer data (rawCustomer)\n2- Existing customer data (dimCustomer)\n3- Filtered existing customer data (activeCustomer)\n4- Identify net new customers (newRecords)\n5- Identify existing customers (existingRecords)\n6- Add hash fingerprint to existing customers from new data (addHash)\n7- Add hash fingerprint to existing customers from existing data (addHashDim)\n8- Identify existing customers with changed values (changedRecords)\n9- Union newRecords and changedRecords (unionNewActive)\n10- Mark these rows as INSERT (markAsInsert)\n11- Add an incremental key (addTempKey)\n12- Calculate current maximum surrogate key from existing data (maxSurrogateKey)\n13- Join two data streams addTempKey and maxSurrogateKey (joinMaxSurrogateKey)\n14- Set value for SCD columns such as CustomerSK, IsActive, ValidFrom, ValidTo (scdColumns)\n15- Drop temporary columns such as Hash, TempKey, and MaxCustomerSK (dropTempColumns)\n16- Identify obsolete customer records (obsoleteRecords)\n17- Mark these rows as UPDATE (markAsUpdate)\n18- Set value for SCD columns such as IsActive and ValidTo (scdColumnsObsolete)\n19- Drop the temporary column Hash (dropTempColumns2)\n20- Union the two streams (unionResults)\n21- Write the results into the Delta Lake (sinkCustomer)\n\nStep 4 (Automation using Triggers)\n===================================\nPeriodically copy changes from source using a Tumbling Window trigger.\nOn the arrival of new files in the data lake, incrementally load the dimension table using a Storage Event trigger.\n\nTumbling window triggers are a type of trigger that fire at a periodic time interval. In this step, a new tumbling window trigger will be associated with \nthe pipeline from step 1. The trigger will be set to run every 5 minutes and pass trigger outputs (windowStartTime and windowEndTime) to the corresponding \npipeline parameters (triggerStartTime and triggerEndTime).\n\nStorage event triggers are a type of trigger that fire when certain types of storage events occur (e.g. Blob created or Blob deleted ). In this step, \na new storage event trigger will be associated with the pipeline from Step 3. The trigger will be set to fire whenever a Blob created event occurs \nwithin the wwi/customers directory for blob paths that end in .csv. Trigger output @trigger().outputs.body.fileName will be passed to the pipeline parameter fileName.\n\nLoad additional data into customers\n-----------------------------------\nIn this step, execute SQL code within the Azure SQL Database (source system) against the target table dbo.Customers. The code will make changes to \nexisting customer records (UPDATE), as well as the addition of net new customer records (INSERT).\n\nUPDATE dbo.Customers SET CustomerAddress = '34 Park Road, East London, E9 7RW' WHERE CustomerID = 5;\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('169 Manchester Road, Preston, PR35 8AQ'),\n    ('52 Broadway, Plymouth, PL39 3PY');\nSELECT * FROM [dbo].[Customers];\n\nSince our pipelines are being automatically executed based on triggers, the data changes applied in the previous step will result in data automatically \nflowing from source (Azure SQL Database) to destination (Azure Data Lake Storage Gen2), then subsequently transformed before finally being loaded in the \nDelta Lake table format.\n\nThe tumbling window trigger will execute Step 1 Pipeline every 5 minutes.\nIf changes are detected, data is copied to ADLS Gen 2 (raw).\nUpon the detection of a new CSV file, the storage event trigger will execute Step 3 Pipeline\nThe pipeline will cross-check the raw data (CSV) against the existing curated data (Delta Lake) and UPSERT the new data adhering to the SCD Type 2 pattern.\n\nServerless SQL pool is a query service that comes with every Azure Synapse Analytics workspace. Serverless SQL pool enables you to query files such as \nParquet, Delta Lake, and delimited text formats, from the Azure Data Lake, without the need to copy or load data into a specialized store.\n\n-- Inserting new orders\nINSERT INTO dbo.Orders (CustomerID, Quantity)\nVALUES\n    (1,13),\n    (2,72),\n    (5,52),\n    (7,28);\nSELECT * FROM [dbo].[Orders];",
 					"metadata": {
 						"language": "sql"
 					},
@@ -59223,68 +59285,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/3_IncrementalOrdersWatermark')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipeline": {
-					"pipelineReference": {
-						"referenceName": "3_IncrementalOrdersWatermark",
-						"type": "PipelineReference"
-					},
-					"parameters": {}
-				},
-				"type": "TumblingWindowTrigger",
-				"typeProperties": {
-					"frequency": "Minute",
-					"interval": 5,
-					"startTime": "2022-11-12T02:48:00Z",
-					"delay": "00:00:00",
-					"maxConcurrency": 50,
-					"retryPolicy": {
-						"intervalInSeconds": 30
-					},
-					"dependsOn": []
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/04_FactIncrementalLoad')]",
-			"type": "Microsoft.Synapse/workspaces/triggers",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "4_FactIncrementalLoad",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"fileName": "[parameters('04_FactIncrementalLoad_properties_4_FactIncrementalLoad_parameters_fileName')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/advwks/blobs/raw/wwi/orders",
-					"blobPathEndsWith": ".csv",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('04_FactIncrementalLoad_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/4_FactIncrementalLoad')]"
 			]
 		}
 	]

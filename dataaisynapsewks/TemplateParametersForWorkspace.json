@@ -68,6 +68,12 @@
 		"nyc_tlc_yellow_sasUri": {
 			"value": ""
 		},
+		"04_FactIncrementalLoad_properties_4_FactIncrementalLoad_parameters_fileName": {
+			"value": "@trigger().outputs.body.fileName"
+		},
+		"04_FactIncrementalLoad_properties_typeProperties_scope": {
+			"value": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
+		},
 		"0_IncrementalCustomerCdc_properties_pipeline_parameters_triggerStartTime": {
 			"value": "@formatDateTime(trigger().outputs.windowStartTime,'yyyy-MM-dd HH:mm:ss.fff')"
 		},
@@ -78,12 +84,6 @@
 			"value": "@trigger().outputs.body.fileName"
 		},
 		"2_DimIncrementalLoad_properties_typeProperties_scope": {
-			"value": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
-		},
-		"04_FactIncrementalLoad_properties_4_FactIncrementalLoad_parameters_fileName": {
-			"value": "@trigger().outputs.body.fileName"
-		},
-		"04_FactIncrementalLoad_properties_typeProperties_scope": {
 			"value": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
 		}
 	}
