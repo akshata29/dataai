@@ -3471,6 +3471,262 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/3_IncrementalOrdersWatermark')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "getOldWatermark",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT * FROM Watermark WHERE TableName = 'dbo.Orders'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dataaisql",
+								"type": "DatasetReference",
+								"parameters": {
+									"schema": "dbo",
+									"table": "Watermark"
+								}
+							}
+						}
+					},
+					{
+						"name": "getNewWatermark",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "SELECT MAX(LastModifiedDateTime) as NewWatermarkValue FROM dbo.Orders",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dataaisql",
+								"type": "DatasetReference",
+								"parameters": {
+									"schema": "dbo",
+									"table": "Orders"
+								}
+							}
+						}
+					},
+					{
+						"name": "getChangeCount",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "getOldWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "getNewWatermark",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT COUNT(*) as changecount FROM dbo.Orders WHERE LastModifiedDateTime > '@{activity('getOldWatermark').output.firstRow.Watermark}' and LastModifiedDateTime <= '@{activity('getNewWatermark').output.firstRow.NewWatermarkValue}'",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "dataaisql",
+								"type": "DatasetReference",
+								"parameters": {
+									"schema": "dbo",
+									"table": "Orders"
+								}
+							}
+						}
+					},
+					{
+						"name": "hasChangedRows",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "getChangeCount",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(int(activity('getChangeCount').output.firstRow.changecount),0)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "incrementalCopy",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT * FROM dbo.Orders WHERE LastModifiedDateTime > '@{activity('getOldWatermark').output.firstRow.Watermark}' and LastModifiedDateTime <= '@{activity('getNewWatermark').output.firstRow.NewWatermarkValue}'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "dataaisql",
+											"type": "DatasetReference",
+											"parameters": {
+												"schema": "dbo",
+												"table": "Orders"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "advwksraw",
+											"type": "DatasetReference",
+											"parameters": {
+												"folderPath": "wwi/orders",
+												"fileName": {
+													"value": "@concat(formatDateTime(pipeline().TriggerTime,'yyyyMMddHHmmssfff'),'.csv')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "updateWatermark",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "incrementalCopy",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[dbo].[sp_update_watermark]",
+										"storedProcedureParameters": {
+											"LastModifiedDateTime": {
+												"value": {
+													"value": "@{activity('getNewWatermark').output.firstRow.NewWatermarkValue}",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"TableName": {
+												"value": {
+													"value": "@{activity('getOldWatermark').output.firstRow.TableName}",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "dataaisql",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "Lakehouse"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/dataaisql')]",
+				"[concat(variables('workspaceId'), '/datasets/advwksraw')]",
+				"[concat(variables('workspaceId'), '/linkedServices/dataaisql')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/0_customer_profile_cosmosdb')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
@@ -10299,7 +10555,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/advwks/blobs/wwi/customers",
+					"blobPathBeginsWith": "/advwks/blobs/raw/wwi/customers",
 					"blobPathEndsWith": ".csv",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('2_DimIncrementalLoad_properties_typeProperties_scope')]",
@@ -15844,7 +16100,7 @@
 					"name": "Lakehouse"
 				},
 				"content": {
-					"query": "-- Run following setup script on source Database to create tables and enable CDC\n\n-- To create the source table, copy and paste the code snippet below and click Run\nCREATE TABLE Customers (\n    CustomerID int IDENTITY(1,1) PRIMARY KEY,\n    CustomerAddress varchar(255) NOT NULL\n);\n\n\n-- To enable change data capture on the source table, copy and paste the code snippet below and click Run\nEXEC sys.sp_cdc_enable_db;\nEXEC sys.sp_cdc_enable_table  \n    @source_schema = N'dbo',  \n    @source_name   = N'Customers',  \n    @role_name     = NULL,\n    @supports_net_changes = 1;\n\n\n-- To load the source table with data, copy and paste the code snippet below and click Run\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('82 Margate Drive, Sheffield S4 8FQ'),\n    ('135 High Barns, Ely, CB7 4RH'),\n    ('39 Queen Annes Drive, Bedale, DL8 2EL');\n\n-- Once you ran the 0_IncrementalCustomerCdc Pipeline once, we can run following to test out the updates/inserts before building triggers\nUPDATE dbo.Customers SET CustomerAddress = 'Guyzance Cottage, Guyzance NE65 9AF' WHERE CustomerID = 3;\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('322 Fernhill, Mountain Ash, CF45 3EN'),\n    ('381 Southborough Lane, Bromley, BR2 8BQ');\nSELECT * FROM [dbo].[Customers];\n\n-- Copy and paste the code snippet below and click Run. Note: There may be some latency between the changes being executed and the changes \n-- being recorded in the related CDC table. You may need to wait a minute or two between steps to get the correct start_time and end_time values.\nDECLARE @max_lsn binary(10);\nSET @max_lsn = sys.fn_cdc_get_max_lsn();  \nSELECT\nCONVERT(varchar(16), DATEADD(minute, -1, sys.fn_cdc_map_lsn_to_time(@max_lsn)), 20) as start_time,\nCONVERT(varchar(16), DATEADD(minute, 1, sys.fn_cdc_map_lsn_to_time(@max_lsn)), 20) as end_time\n\n-- Copy and paste the start_time and end_time values into a text editor (e.g. Notepad). \n-- This will be used as input for the pipeline rerun to isolate the second batch of changes made to the dbo.Customers table.\n\n-- Using the start_time and end_time values from the previous step, we will rerun our pipeline and confirm that the changes have been copied \n-- to the Azure Data Lake Gen2 Storage Account.\n\n-- When the pipeline run is complete, under the Output tab, click the Details icon of the Copy data activity to confirm \n-- that three rows have been written to the data lake.\n\n\n",
+					"query": "-- Run following setup script on source Database to create tables and enable CDC\n\n-- To create the source table, copy and paste the code snippet below and click Run\nCREATE TABLE Customers (\n    CustomerID int IDENTITY(1,1) PRIMARY KEY,\n    CustomerAddress varchar(255) NOT NULL\n);\n\n\n-- To enable change data capture on the source table, copy and paste the code snippet below and click Run\nEXEC sys.sp_cdc_enable_db;\nEXEC sys.sp_cdc_enable_table  \n    @source_schema = N'dbo',  \n    @source_name   = N'Customers',  \n    @role_name     = NULL,\n    @supports_net_changes = 1;\n\n\n-- To load the source table with data, copy and paste the code snippet below and click Run\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('82 Margate Drive, Sheffield S4 8FQ'),\n    ('135 High Barns, Ely, CB7 4RH'),\n    ('39 Queen Annes Drive, Bedale, DL8 2EL');\n\n-- Once you ran the 0_IncrementalCustomerCdc Pipeline once, we can run following to test out the updates/inserts before building triggers\nUPDATE dbo.Customers SET CustomerAddress = 'Guyzance Cottage, Guyzance NE65 9AF' WHERE CustomerID = 3;\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('322 Fernhill, Mountain Ash, CF45 3EN'),\n    ('381 Southborough Lane, Bromley, BR2 8BQ');\nSELECT * FROM [dbo].[Customers];\n\n-- Copy and paste the code snippet below and click Run. Note: There may be some latency between the changes being executed and the changes \n-- being recorded in the related CDC table. You may need to wait a minute or two between steps to get the correct start_time and end_time values.\nDECLARE @max_lsn binary(10);\nSET @max_lsn = sys.fn_cdc_get_max_lsn();  \nSELECT\nCONVERT(varchar(16), DATEADD(minute, -1, sys.fn_cdc_map_lsn_to_time(@max_lsn)), 20) as start_time,\nCONVERT(varchar(16), DATEADD(minute, 1, sys.fn_cdc_map_lsn_to_time(@max_lsn)), 20) as end_time\n\n-- Copy and paste the start_time and end_time values into a text editor (e.g. Notepad). \n-- This will be used as input for the pipeline rerun to isolate the second batch of changes made to the dbo.Customers table.\n\n-- Using the start_time and end_time values from the previous step, we will rerun our pipeline and confirm that the changes have been copied \n-- to the Azure Data Lake Gen2 Storage Account.\n\n-- When the pipeline run is complete, under the Output tab, click the Details icon of the Copy data activity to confirm \n-- that three rows have been written to the data lake.\n\n-- create the source table\n-- For Order Tables (using Watermark)\nCREATE TABLE Orders (\n    OrderID int IDENTITY(1,1) PRIMARY KEY,\n    CustomerID int FOREIGN KEY REFERENCES Customers(CustomerID),\n    Quantity int NOT NULL,\n    OrderDateTime DATETIME default CURRENT_TIMESTAMP,\n    LastModifiedDateTime DATETIME default CURRENT_TIMESTAMP\n);\nINSERT INTO dbo.Orders (CustomerID, Quantity)\nVALUES\n    (1,38),\n    (2,27),\n    (3,16),\n    (1,52);\n\n-- create a SQL trigger that will automatically update the LastModifiedDateTime colum on UPDATE\nCREATE TRIGGER trg_orders_update_modified\nON dbo.Orders\nAFTER UPDATE \nAS\n    UPDATE dbo.Orders\n    SET LastModifiedDateTime = CURRENT_TIMESTAMP\n    FROM Inserted i\n    WHERE dbo.Orders.OrderID = i.OrderID;\n\n-- initialize the watermark table\nCREATE TABLE Watermark (\n    TableName varchar(255),\n    Watermark DATETIME\n);\nINSERT INTO dbo.Watermark\nVALUES\n('dbo.Orders', '1/1/2022 12:00:00 AM');\n\n-- enable the ability to programmatically update the watermark value via a stored procedure\nCREATE PROCEDURE sp_update_watermark @LastModifiedDateTime datetime, @TableName varchar(50)\nAS\n    UPDATE Watermark\n    SET [Watermark] = @LastModifiedDateTime\n    WHERE [TableName] = @TableName;\n    ",
 					"metadata": {
 						"language": "sql"
 					},
@@ -16488,7 +16744,7 @@
 					"name": "Lakehouse"
 				},
 				"content": {
-					"query": "-- https://github.com/tayganr/lakehouse",
+					"query": "-- https://github.com/tayganr/lakehouse\n\nData Lakehouse\n\nThe data lakehouse is a data architecture pattern that combines functional aspects of the data warehouse, with the data lake, on one platform. \nThis will walk through an example of how the data lakehouse pattern can be facilitated in Azure with Azure Synapse Analytics.\n\nOLTP (SQL) -> Synapse Pipeline -> Data Lake (Raw, Enriched - Delta, Curated - Delta) -> Serverless SQL -> Power BI\n\nStep 1 (0_IncrementalCustomerCdc)\n=================================\nSynapse Pipeline to incrementally copy data from an OLTP source (Azure SQL Database) to a Data Lake (Azure Data Lake Storage Gen2), leveraging Change Data Capture \ntechnology to isolate changes.\n\nAzure SQL DB(CDC Enabled) -> ChangeCount -> Lookup Activity -> If Condition Check -> Copy Data Activity -> Raw Data Lake\n\n\t* The pipeline will perform an initial check to see if any changes (new records or modifications to existing records) exist in the source system since the last load.\n\t* If there are changes, the new data will be copied to the raw layer of the Data Lake.\n\nDynamic Content for Lookup & Copy Activity\n------------------------------------------\nAt runtime, the pipeline will pass parameters triggerStartTime and triggerEndTime to the @concat function which will result in a SQL statement.\n\nThe query performs the following high-level steps:\n\n* DECLARE variables (@begin_time, @end_time, @from_lsn, and @to_lsn)\n* SET the variable values\n* Calculates the number of net changes within the given time period\n\nThe query is able to achieve this by leveraging CDC functions such as:\n\n* sys.fn_cdc_map_time_to_lsn which returns a log sequence number (LSN) for a given datetime\n* cdc.fn_cdc_get_net_changes_<capture_instance> which returns the net changes for a specified LSN range.\n\nStep 2 (1_DimInitialLoad)\n=========================\nSynapse Pipeline to load data from our raw layer (CSV), into our curated layer (Delta Lake).\n\nRaw Data Lake -> Get Metadata of files -> DataFlow for Initial Load (DataFlow = Source Data -> Surrogate Key -> Derived Column -> Select Column -> \nCurated Customer in Delta Lake format)\n\nStep 3(1_DimIncrementalLoad) (SCD Type 2)\n==========================================\nSynapse Pipeline to incrementally load data from our raw layer (CSV), into our curated layer (Delta Lake) as a SCD Type 2 dimension table.\n\nData Flow Sequence\n1- New customer data (rawCustomer)\n2- Existing customer data (dimCustomer)\n3- Filtered existing customer data (activeCustomer)\n4- Identify net new customers (newRecords)\n5- Identify existing customers (existingRecords)\n6- Add hash fingerprint to existing customers from new data (addHash)\n7- Add hash fingerprint to existing customers from existing data (addHashDim)\n8- Identify existing customers with changed values (changedRecords)\n9- Union newRecords and changedRecords (unionNewActive)\n10- Mark these rows as INSERT (markAsInsert)\n11- Add an incremental key (addTempKey)\n12- Calculate current maximum surrogate key from existing data (maxSurrogateKey)\n13- Join two data streams addTempKey and maxSurrogateKey (joinMaxSurrogateKey)\n14- Set value for SCD columns such as CustomerSK, IsActive, ValidFrom, ValidTo (scdColumns)\n15- Drop temporary columns such as Hash, TempKey, and MaxCustomerSK (dropTempColumns)\n16- Identify obsolete customer records (obsoleteRecords)\n17- Mark these rows as UPDATE (markAsUpdate)\n18- Set value for SCD columns such as IsActive and ValidTo (scdColumnsObsolete)\n19- Drop the temporary column Hash (dropTempColumns2)\n20- Union the two streams (unionResults)\n21- Write the results into the Delta Lake (sinkCustomer)\n\nStep 4 (Automation using Triggers)\n===================================\nPeriodically copy changes from source using a Tumbling Window trigger.\nOn the arrival of new files in the data lake, incrementally load the dimension table using a Storage Event trigger.\n\nTumbling window triggers are a type of trigger that fire at a periodic time interval. In this step, a new tumbling window trigger will be associated with \nthe pipeline from step 1. The trigger will be set to run every 5 minutes and pass trigger outputs (windowStartTime and windowEndTime) to the corresponding \npipeline parameters (triggerStartTime and triggerEndTime).\n\nStorage event triggers are a type of trigger that fire when certain types of storage events occur (e.g. Blob created or Blob deleted ). In this step, \na new storage event trigger will be associated with the pipeline from Step 3. The trigger will be set to fire whenever a Blob created event occurs \nwithin the wwi/customers directory for blob paths that end in .csv. Trigger output @trigger().outputs.body.fileName will be passed to the pipeline parameter fileName.\n\nLoad additional data into customers\n-----------------------------------\nIn this step, execute SQL code within the Azure SQL Database (source system) against the target table dbo.Customers. The code will make changes to \nexisting customer records (UPDATE), as well as the addition of net new customer records (INSERT).\n\nUPDATE dbo.Customers SET CustomerAddress = '34 Park Road, East London, E9 7RW' WHERE CustomerID = 5;\nINSERT INTO dbo.Customers (CustomerAddress)\nVALUES\n    ('169 Manchester Road, Preston, PR35 8AQ'),\n    ('52 Broadway, Plymouth, PL39 3PY');\nSELECT * FROM [dbo].[Customers];\n\nSince our pipelines are being automatically executed based on triggers, the data changes applied in the previous step will result in data automatically \nflowing from source (Azure SQL Database) to destination (Azure Data Lake Storage Gen2), then subsequently transformed before finally being loaded in the \nDelta Lake table format.\n\nThe tumbling window trigger will execute Step 1 Pipeline every 5 minutes.\nIf changes are detected, data is copied to ADLS Gen 2 (raw).\nUpon the detection of a new CSV file, the storage event trigger will execute Step 3 Pipeline\nThe pipeline will cross-check the raw data (CSV) against the existing curated data (Delta Lake) and UPSERT the new data adhering to the SCD Type 2 pattern.\n\nServerless SQL pool is a query service that comes with every Azure Synapse Analytics workspace. Serverless SQL pool enables you to query files such as \nParquet, Delta Lake, and delimited text formats, from the Azure Data Lake, without the need to copy or load data into a specialized store.\n\n",
 					"metadata": {
 						"language": "sql"
 					},
