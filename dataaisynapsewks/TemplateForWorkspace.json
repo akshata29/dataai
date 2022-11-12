@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'dataaifile'"
 		},
+		"dataaihivesql_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'dataaihivesql'"
+		},
 		"dataainsmidw_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dataainsmidw'"
@@ -38,10 +42,6 @@
 		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'dataaisynapsewks-WorkspaceDefaultSqlServer'"
-		},
-		"dataaihivesql_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'dataaihivesql'"
 		},
 		"dataaianomalydetector_properties_typeProperties_subscriptionId": {
 			"type": "string",
@@ -10338,6 +10338,34 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/dataaihivesql')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('dataaihivesql_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "dataaikeyvault",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "dataaisqlpassword"
+					}
+				},
+				"connectVia": {
+					"referenceName": "dataaiir",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/dataaiir')]",
+				"[concat(variables('workspaceId'), '/linkedServices/dataaikeyvault')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/dataaikeyvault')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
@@ -20273,6 +20301,230 @@
 							"displayHTML(h)"
 						],
 						"outputs": []
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/0_External Metastore')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Other"
+				},
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "dataaispk",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "b17732dd-82e3-4c33-b746-80e58148f9d5"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "scala"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Synapse/workspaces/dataaisynapsewks/bigDataPools/dataaispk",
+						"name": "dataaispk",
+						"type": "Spark",
+						"endpoint": "https://dataaisynapsewks.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/dataaispk",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.2",
+						"nodeCount": 10,
+						"cores": 4,
+						"memory": 28
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "code",
+						"metadata": {
+							"microsoft": {
+								"language": "scala"
+							}
+						},
+						"source": [
+							"%%spark\r\n",
+							"import java.sql.DriverManager \r\n",
+							"/** this JDBC url could be copied from Azure portal > Azure SQL database > Connection strings > JDBC **/ \r\n",
+							"val url = s\"jdbc:sqlserver://dataaisqlsrv.database.windows.net:1433;database=dataaihivesql;user=azureadmin;password=P2ssw0rd2903$$;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;\" \r\n",
+							"try { \r\n",
+							"    val connection = DriverManager.getConnection(url) \r\n",
+							"    val result = connection.createStatement().executeQuery(\"select t.SCHEMA_VERSION from VERSION t\") \r\n",
+							"    result.next(); \r\n",
+							"    println(s\"Successful to test connection. Hive Metastore version is ${result.getString(1)}\") \r\n",
+							"} catch { \r\n",
+							"    case ex: Throwable => println(s\"Failed to establish connection:\\n $ex\") \r\n",
+							"}"
+						],
+						"outputs": [],
+						"execution_count": 7
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Configure settings at the session level"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"%%configure -f\r\n",
+							"{\r\n",
+							"    \"conf\":{\r\n",
+							"\t  \"spark.sql.hive.metastore.version\":\"2.3\",\r\n",
+							"        \"spark.sql.hive.metastore.jars\":\"/opt/hive-metastore/lib-2.3/*:/usr/hdp/current/hadoop-client/lib/*:/usr/hdp/current/hadoop-client/*\",\r\n",
+							"\t  \"spark.hadoop.hive.synapse.externalmetastore.linkedservice.name\":\"dataaihivesql\"\r\n",
+							"    }\r\n",
+							"}"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"## Run queries to verify the connection"
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"spark.sql(\"show databases\").show()"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql\r\n",
+							"\r\n",
+							"select count(*) from nyctaxi.green_taxi_trips_raw"
+						],
+						"outputs": [],
+						"execution_count": 17
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql\r\n",
+							"\r\n",
+							"select count(*), trip_year, trip_month from nyctaxi.green_taxi_trips_raw \r\n",
+							"group by trip_year, trip_month\r\n",
+							"order by trip_year, trip_month"
+						],
+						"outputs": [],
+						"execution_count": 16
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							""
+						],
+						"outputs": [],
+						"execution_count": null
 					}
 				]
 			},
@@ -59312,34 +59564,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/managedVirtualNetworks/default')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaihivesql')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('dataaihivesql_connectionString')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "dataaikeyvault",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "dataaisqlpassword"
-					}
-				},
-				"connectVia": {
-					"referenceName": "dataaiir",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/dataaiir')]",
-				"[concat(variables('workspaceId'), '/linkedServices/dataaikeyvault')]"
 			]
 		}
 	]

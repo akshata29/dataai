@@ -20,6 +20,9 @@
 		"dataaifile_password": {
 			"value": ""
 		},
+		"dataaihivesql_connectionString": {
+			"value": ""
+		},
 		"dataainsmidw_connectionString": {
 			"value": ""
 		},
@@ -27,9 +30,6 @@
 			"value": ""
 		},
 		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
-			"value": ""
-		},
-		"dataaihivesql_connectionString": {
 			"value": ""
 		},
 		"dataaianomalydetector_properties_typeProperties_subscriptionId": {
