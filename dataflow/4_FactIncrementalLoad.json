@@ -1,0 +1,128 @@
+{
+	"name": "4_FactIncrementalLoad",
+	"properties": {
+		"folder": {
+			"name": "Lakehouse"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"linkedService": {
+						"referenceName": "dataairawdls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "rawOrders"
+				},
+				{
+					"linkedService": {
+						"referenceName": "dataaicurateddls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "dimCustomer"
+				}
+			],
+			"sinks": [
+				{
+					"linkedService": {
+						"referenceName": "dataaicurateddls",
+						"type": "LinkedServiceReference"
+					},
+					"name": "sinkOrders"
+				}
+			],
+			"transformations": [
+				{
+					"name": "activeCustomers"
+				},
+				{
+					"name": "lookupDimCustomer"
+				},
+				{
+					"name": "selectFactColumns"
+				},
+				{
+					"name": "checkForEarlyFacts"
+				},
+				{
+					"name": "markAsUpsert"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     fileName as string",
+				"}",
+				"source(output(",
+				"          OrderID as short,",
+				"          CustomerID as short,",
+				"          Quantity as short,",
+				"          OrderDateTime as string,",
+				"          LastModifiedDateTime as string",
+				"     ),",
+				"     useSchema: false,",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delimited',",
+				"     fileSystem: 'advwks',",
+				"     folderPath: 'raw/wwi/orders',",
+				"     fileName: ($fileName),",
+				"     columnDelimiter: ',',",
+				"     escapeChar: '\\\\',",
+				"     quoteChar: '\\\"',",
+				"     columnNamesAsHeader: true) ~> rawOrders",
+				"source(output(",
+				"          CustomerSK as long,",
+				"          CustomerID as short,",
+				"          CustomerAddress as string,",
+				"          IsActive as integer,",
+				"          ValidFrom as timestamp,",
+				"          ValidTo as timestamp",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     format: 'delta',",
+				"     compressionType: 'snappy',",
+				"     compressionLevel: 'Fastest',",
+				"     fileSystem: 'advwks',",
+				"     folderPath: 'curated/wwi/customers') ~> dimCustomer",
+				"dimCustomer filter(IsActive == 1) ~> activeCustomers",
+				"rawOrders, activeCustomers lookup(rawOrders@CustomerID == dimCustomer@CustomerID,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupDimCustomer",
+				"lookupDimCustomer select(mapColumn(",
+				"          OrderID,",
+				"          CustomerKey = CustomerSK,",
+				"          Quantity",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectFactColumns",
+				"selectFactColumns derive(CustomerKey = iif(isNull(CustomerKey),toLong(0),CustomerKey)) ~> checkForEarlyFacts",
+				"checkForEarlyFacts alterRow(upsertIf(true())) ~> markAsUpsert",
+				"markAsUpsert sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'delta',",
+				"     compressionType: 'snappy',",
+				"     compressionLevel: 'Fastest',",
+				"     fileSystem: 'advwks',",
+				"     folderPath: 'curated/wwi/orders',",
+				"     mergeSchema: false,",
+				"     autoCompact: false,",
+				"     optimizedWrite: false,",
+				"     vacuum: 0,",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     keys:['SalesOrderID'],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sinkOrders"
+			]
+		}
+	}
+}
