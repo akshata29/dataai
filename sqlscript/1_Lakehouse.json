@@ -1,0 +1,20 @@
+{
+	"name": "1_Lakehouse",
+	"properties": {
+		"folder": {
+			"name": "Lakehouse"
+		},
+		"content": {
+			"query": "-- Create Logical Data warehouse\nCREATE DATABASE ldw COLLATE Latin1_General_100_BIN2_UTF8;\n\nUSE ldw;\ngo\n\n-- Create Schemas\nCREATE SCHEMA wwi;\n\n-- Create Views\n-- Views are virtual tables which encapsulate and enable reuse of serverless SQL pool queries. Once created, views \n-- can be consumed by SQL compatible tools such as Power BI. In this step, we will create views on top of our Delta Lake tables, \n-- customers and orders.\n\nCREATE VIEW wwi.customers\nAS SELECT *\nFROM\n    OPENROWSET(\n        BULK 'https://dataaicurateddls.dfs.core.windows.net/advwks/curated/wwi/customers',\n        FORMAT = 'DELTA'\n    ) AS [result];\n\nCREATE VIEW wwi.orders\nAS SELECT *\nFROM\n    OPENROWSET(\n        BULK 'https://dataaicurateddls.dfs.core.windows.net/advwks/curated/wwi/orders',\n        FORMAT = 'DELTA'\n    ) AS [result];\n\nselect * from wwi.orders\nselect * from wwi.customers\n\nSELECT\n    orders.CustomerKey,\n    customers.CustomerID,\n    customers.CustomerAddress,\n    customers.IsActive,\n    orders.Quantity\nFROM\n    wwi.orders AS orders,\n    wwi.customers AS customers\nWHERE\n    orders.CustomerKey = customers.CustomerSK\n--GROUP BY\n--    orders.CustomerKey,\n--    customers.CustomerAddress\nORDER BY\n    orders.CustomerKey ASC\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "ldw",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
