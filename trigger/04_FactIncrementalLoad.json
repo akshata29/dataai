@@ -8,6 +8,9 @@
 				"pipelineReference": {
 					"referenceName": "4_FactIncrementalLoad",
 					"type": "PipelineReference"
+				},
+				"parameters": {
+					"fileName": "@trigger().outputs.body.fileName"
 				}
 			}
 		],
