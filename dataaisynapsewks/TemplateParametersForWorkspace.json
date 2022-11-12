@@ -73,6 +73,12 @@
 		},
 		"0_IncrementalCustomerCdc_properties_pipeline_parameters_triggerEndTime": {
 			"value": "@formatDateTime(trigger().outputs.windowEndTime,'yyyy-MM-dd HH:mm:ss.fff')"
+		},
+		"2_DimIncrementalLoad_properties_2_DimIncrementalLoad_parameters_fileName": {
+			"value": "@trigger().outputs.body.fileName"
+		},
+		"2_DimIncrementalLoad_properties_typeProperties_scope": {
+			"value": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
 		}
 	}
 }

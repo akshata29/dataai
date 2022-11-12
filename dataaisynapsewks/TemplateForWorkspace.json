@@ -98,6 +98,14 @@
 		"0_IncrementalCustomerCdc_properties_pipeline_parameters_triggerEndTime": {
 			"type": "string",
 			"defaultValue": "@formatDateTime(trigger().outputs.windowEndTime,'yyyy-MM-dd HH:mm:ss.fff')"
+		},
+		"2_DimIncrementalLoad_properties_2_DimIncrementalLoad_parameters_fileName": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.body.fileName"
+		},
+		"2_DimIncrementalLoad_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/e2171f6d-2650-45e6-af7e-6d6e44ca92b1/resourceGroups/dataai/providers/Microsoft.Storage/storageAccounts/dataairawdls"
 		}
 	},
 	"variables": {
@@ -10272,6 +10280,39 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/2_DimIncrementalLoad')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "2_DimIncrementalLoad",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"fileName": "[parameters('2_DimIncrementalLoad_properties_2_DimIncrementalLoad_parameters_fileName')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/advwks/blobs/wwi/customers",
+					"blobPathEndsWith": ".csv",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('2_DimIncrementalLoad_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/pipelines/2_DimIncrementalLoad')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/AutoResolveIntegrationRuntime')]",
 			"type": "Microsoft.Synapse/workspaces/integrationRuntimes",
 			"apiVersion": "2019-06-01-preview",
@@ -14847,7 +14888,7 @@
 						"     compressionType: 'snappy',",
 						"     compressionLevel: 'Fastest',",
 						"     fileSystem: 'advwks',",
-						"     folderPath: 'consume/wwi/customers',",
+						"     folderPath: 'curated/wwi/customers',",
 						"     mergeSchema: false,",
 						"     autoCompact: false,",
 						"     optimizedWrite: false,",
@@ -58436,6 +58477,30 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dataaitpcdw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/dataai24spk')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -58480,30 +58545,6 @@
 				"sparkVersion": "3.2",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaitpcdw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
