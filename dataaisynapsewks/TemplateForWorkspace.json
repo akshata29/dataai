@@ -2767,6 +2767,68 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/2_DimIncrementalLoad')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "incrementalLoad",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "2_DimIncrementalLoad",
+								"type": "DataFlowReference",
+								"parameters": {
+									"fileName": {
+										"value": "'@{pipeline().parameters.fileName}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"rawCustomer": {},
+									"dimCustomer": {},
+									"sinkCustomer": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "dataaiir",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"fileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Lakehouse"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/dataflows/2_DimIncrementalLoad')]",
+				"[concat(variables('workspaceId'), '/integrationRuntimes/dataaiir')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/2_GreenTaxiRawToCurated')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -14596,6 +14658,216 @@
 				"[concat(variables('workspaceId'), '/datasets/1_nyctaxistageyellowds202008091112')]",
 				"[concat(variables('workspaceId'), '/datasets/1_nyctaxistageyellowds2021and2022')]",
 				"[concat(variables('workspaceId'), '/datasets/1_nyctaxirawyellowds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/2_DimIncrementalLoad')]",
+			"type": "Microsoft.Synapse/workspaces/dataflows",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "Lakehouse"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"linkedService": {
+								"referenceName": "dataairawdls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "rawCustomer"
+						},
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "dimCustomer"
+						}
+					],
+					"sinks": [
+						{
+							"linkedService": {
+								"referenceName": "dataaicurateddls",
+								"type": "LinkedServiceReference"
+							},
+							"name": "sinkCustomer"
+						}
+					],
+					"transformations": [
+						{
+							"name": "activeCustomers"
+						},
+						{
+							"name": "addHashDim"
+						},
+						{
+							"name": "maxSurrogateKey"
+						},
+						{
+							"name": "existingRecords"
+						},
+						{
+							"name": "newRecords"
+						},
+						{
+							"name": "addHash"
+						},
+						{
+							"name": "changedRecords"
+						},
+						{
+							"name": "unionNewActive"
+						},
+						{
+							"name": "markAsInsert"
+						},
+						{
+							"name": "addTempKey"
+						},
+						{
+							"name": "joinMaxSurrogateKey"
+						},
+						{
+							"name": "scdColumns"
+						},
+						{
+							"name": "dropTempColumns"
+						},
+						{
+							"name": "obsoleteRecords"
+						},
+						{
+							"name": "markAsUpdate"
+						},
+						{
+							"name": "scdColumnsObsolete"
+						},
+						{
+							"name": "dropTempColumns2"
+						},
+						{
+							"name": "unionResults"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     fileName as string",
+						"}",
+						"source(output(",
+						"          CustomerID as short,",
+						"          CustomerAddress as string",
+						"     ),",
+						"     useSchema: false,",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'delimited',",
+						"     fileSystem: 'advwks',",
+						"     folderPath: 'raw/wwi/customers',",
+						"     fileName: ($fileName),",
+						"     columnDelimiter: ',',",
+						"     escapeChar: '\\\\',",
+						"     quoteChar: '\\\"',",
+						"     columnNamesAsHeader: true) ~> rawCustomer",
+						"source(output(",
+						"          CustomerSK as long,",
+						"          CustomerID as short,",
+						"          CustomerAddress as string,",
+						"          IsActive as integer,",
+						"          ValidFrom as timestamp,",
+						"          ValidTo as timestamp",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     format: 'delta',",
+						"     compressionType: 'snappy',",
+						"     compressionLevel: 'Fastest',",
+						"     fileSystem: 'advwks',",
+						"     folderPath: 'curated/wwi/customers') ~> dimCustomer",
+						"dimCustomer filter(IsActive == 1) ~> activeCustomers",
+						"activeCustomers derive(Hash = md5(CustomerID,CustomerAddress)) ~> addHashDim",
+						"activeCustomers aggregate(MaxCustomerSK = max(CustomerSK)) ~> maxSurrogateKey",
+						"rawCustomer, activeCustomers exists(rawCustomer@CustomerID == dimCustomer@CustomerID,",
+						"     negate:false,",
+						"     broadcast: 'auto')~> existingRecords",
+						"rawCustomer, activeCustomers exists(rawCustomer@CustomerID == dimCustomer@CustomerID,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> newRecords",
+						"existingRecords derive(Hash = md5(columns())) ~> addHash",
+						"addHash, addHashDim exists(addHash@Hash == addHashDim@Hash,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> changedRecords",
+						"changedRecords, newRecords union(byName: true)~> unionNewActive",
+						"unionNewActive alterRow(insertIf(true())) ~> markAsInsert",
+						"markAsInsert keyGenerate(output(TempKey as long),",
+						"     startAt: 1L,",
+						"     stepValue: 1L) ~> addTempKey",
+						"addTempKey, maxSurrogateKey join(true(),",
+						"     joinType:'cross',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> joinMaxSurrogateKey",
+						"joinMaxSurrogateKey derive(CustomerSK = TempKey + MaxCustomerSK,",
+						"          IsActive = 1,",
+						"          ValidFrom = toTimestamp(split($fileName,'.')[1], 'yyyyMMddHHmmssSSS'),",
+						"          ValidTo = toTimestamp('9999-12-31 00:00:00')) ~> scdColumns",
+						"scdColumns select(mapColumn(",
+						"          CustomerSK,",
+						"          CustomerID,",
+						"          CustomerAddress,",
+						"          IsActive,",
+						"          ValidFrom,",
+						"          ValidTo",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> dropTempColumns",
+						"addHashDim, changedRecords exists(dimCustomer@CustomerID == rawCustomer@CustomerID,",
+						"     negate:false,",
+						"     broadcast: 'auto')~> obsoleteRecords",
+						"obsoleteRecords alterRow(updateIf(true())) ~> markAsUpdate",
+						"markAsUpdate derive(IsActive = 0,",
+						"          ValidTo = toTimestamp(split($fileName,'.')[1], 'yyyyMMddHHmmssSSS')) ~> scdColumnsObsolete",
+						"scdColumnsObsolete select(mapColumn(",
+						"          CustomerSK,",
+						"          CustomerID,",
+						"          CustomerAddress,",
+						"          IsActive,",
+						"          ValidFrom,",
+						"          ValidTo",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> dropTempColumns2",
+						"dropTempColumns, dropTempColumns2 union(byName: true)~> unionResults",
+						"unionResults sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     format: 'delta',",
+						"     compressionType: 'snappy',",
+						"     compressionLevel: 'Fastest',",
+						"     fileSystem: 'advwks',",
+						"     folderPath: 'consume/wwi/customers',",
+						"     mergeSchema: false,",
+						"     autoCompact: false,",
+						"     optimizedWrite: false,",
+						"     vacuum: 0,",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:true,",
+						"     keys:['CustomerSK'],",
+						"     umask: 0022,",
+						"     preCommands: [],",
+						"     postCommands: [],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sinkCustomer"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/dataairawdls')]",
+				"[concat(variables('workspaceId'), '/linkedServices/dataaicurateddls')]"
 			]
 		},
 		{
@@ -58164,30 +58436,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/dataaitpcdw')]",
-			"type": "Microsoft.Synapse/workspaces/sqlPools",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"collation": "SQL_Latin1_General_CP1_CI_AS",
-				"maxSizeBytes": 263882790666240,
-				"annotations": []
-			},
-			"dependsOn": [],
-			"location": "southcentralus"
-		},
-		{
 			"name": "[concat(parameters('workspaceName'), '/dataai24spk')]",
 			"type": "Microsoft.Synapse/workspaces/bigDataPools",
 			"apiVersion": "2019-06-01-preview",
@@ -58232,6 +58480,30 @@
 				"sparkVersion": "3.2",
 				"isComputeIsolationEnabled": false,
 				"sessionLevelPackagesEnabled": false,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dataaidw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
+				"annotations": []
+			},
+			"dependsOn": [],
+			"location": "southcentralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/dataaitpcdw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 263882790666240,
 				"annotations": []
 			},
 			"dependsOn": [],
