@@ -32,6 +32,9 @@
 		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
 			"value": ""
 		},
+		"onpremisesql_connectionString": {
+			"value": ""
+		},
 		"dataaianomalydetector_properties_typeProperties_subscriptionId": {
 			"value": "e2171f6d-2650-45e6-af7e-6d6e44ca92b1"
 		},
