@@ -2,7 +2,7 @@
 	"name": "0_IncrementalCustomerCdc",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "0_IncrementalCustomerCdc",
