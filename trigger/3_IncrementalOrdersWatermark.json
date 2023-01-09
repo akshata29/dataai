@@ -2,7 +2,7 @@
 	"name": "3_IncrementalOrdersWatermark",
 	"properties": {
 		"annotations": [],
-		"runtimeState": "Started",
+		"runtimeState": "Stopped",
 		"pipeline": {
 			"pipelineReference": {
 				"referenceName": "3_IncrementalOrdersWatermark",
