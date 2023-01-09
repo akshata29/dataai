@@ -10690,7 +10690,6 @@
 					"frequency": "Minute",
 					"interval": 5,
 					"startTime": "2022-11-11T23:38:00Z",
-					"endTime": "2023-01-08T00:01:59Z",
 					"delay": "00:00:00",
 					"maxConcurrency": 50,
 					"retryPolicy": {
@@ -10753,7 +10752,6 @@
 					"frequency": "Minute",
 					"interval": 5,
 					"startTime": "2022-11-12T02:48:00Z",
-					"endTime": "2023-01-08T00:02:31Z",
 					"delay": "00:00:00",
 					"maxConcurrency": 50,
 					"retryPolicy": {
