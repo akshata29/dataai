@@ -9,28 +9,28 @@
 			"value": ""
 		},
 		"dataaidw_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataaisynapsewks.sql.azuresynapse.net;Initial Catalog=dataaidw;User ID=azsynapseadmin"
 		},
 		"dataaidw_highperf_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataaisynapsewks.sql.azuresynapse.net;Initial Catalog=dataaidw;User ID=asa.sql.highperf"
 		},
 		"dataaidw_import01_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataaisynapsewks.sql.azuresynapse.net;Initial Catalog=dataaidw;User ID=asa.sql.import01"
 		},
 		"dataaifile_password": {
 			"value": ""
 		},
 		"dataaihivesql_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataaisqlsrv.database.windows.net;Initial Catalog=dataaihivesql;User ID=azureadmin"
 		},
 		"dataainsmidw_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName}"
 		},
 		"dataaisql_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=dataaisqlsrv.database.windows.net;Initial Catalog=dataaisql;User ID=azureadmin"
 		},
 		"dataaisynapsewks-WorkspaceDefaultSqlServer_connectionString": {
-			"value": ""
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:dataaisynapsewks.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
 		"onpremisesql_connectionString": {
 			"value": ""
