@@ -1,0 +1,11 @@
+{
+	"name": "pbiembed",
+	"properties": {
+		"annotations": [],
+		"type": "PowerBIWorkspace",
+		"typeProperties": {
+			"workspaceID": "26a2be87-3e36-46a0-8d7d-f618ee6a8d5d",
+			"tenantID": "b82069fa-ada8-453a-817b-e6348d534d88"
+		}
+	}
+}
